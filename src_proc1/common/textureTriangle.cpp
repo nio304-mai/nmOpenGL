@@ -2,13 +2,43 @@
 #include "demo3d_common.h"
 #include "demo3d_nm1.h"
 #include "nmgltex_nm1.h"
-#include "textureTriangle.h"
-#include "tex_common.h"
-#include <stdio.h>
-#include <math.h>
-#include <float.h> //TODO: only FLT_EPSILON is used from float.h
+//#include "textureTriangle.h"
+#include "nmgltex_common.h"
 
-#define TEXTURE_TRIANGLE_SECTION ".text_demo3dExt"
+#if 0
+
+SECTION(".text_demo3d") void foo(
+	Pattern* patterns,
+	nm32s** pROI,
+	MyStruct* a,
+	Rectangle* windows
+) {
+	printf ("%s %d \n", __func__, __LINE__);
+	return;
+};
+
+#endif //0
+
+#if 0
+SECTION(".text_demo3d") void textureTriangle(Pattern* patterns,
+	TrianglesInfo* triangles,
+	nm32s** pROI,
+	Rectangle* windows,
+	nm32s* pSrcTriangle,
+	nm32s* pDstTriangle,
+	int count)
+{
+	return;
+}
+#endif //0
+
+#if 1
+//#include <stdio.h>
+//#include <math.h>
+//#include <float.h> //TODO: only FLT_EPSILON is used from float.h
+#define FLT_EPSILON 1.19209290E-07F
+
+#define TEXTURE_TRIANGLE_SECTION ".text_demo3d"
 
 #ifdef TEXTURE_ENABLED
 #define USE_BARYCENTRIC
@@ -32,9 +62,9 @@ typedef struct Vec2f {
 } Vec2f;
 
 typedef struct Vec3f {
-    float x;
-    float y;
-    float z;
+    nm32f x;
+    nm32f y;
+    nm32f z;
 } Vec3f;
 
 typedef struct color {
@@ -43,6 +73,18 @@ typedef struct color {
     unsigned char b;
     unsigned char a;
 } color;
+
+SECTION(".data_imu0") Vec2f st;
+SECTION(".data_imu0") color pixelValue;
+SECTION(".data_imu0") Vec3f cv;
+SECTION(".data_imu0") Vec3f cs;
+SECTION(".data_imu0") Vec3f cc;
+SECTION(".data_imu0") Vec3f cf;
+SECTION(".data_imu0") Vec3f texEnvColor;
+// SECTION(".data_imu0") nm32f ac;
+// SECTION(".data_imu0") nm32f av;
+// SECTION(".data_imu0") nm32f af;
+// SECTION(".data_imu0") nm32f as;
 
 // filter_mode_t textureMinFilter = NEAREST; //default NEAREST_MIPMAP_LINEAR
 // filter_mode_t textureMagFilter = NEAREST; //default LINEAR
@@ -65,6 +107,36 @@ SECTION(TEXTURE_TRIANGLE_SECTION)
 int min (int a, int b)
 {
     return (b < a) ? b : a;
+}
+
+SECTION(TEXTURE_TRIANGLE_SECTION)
+float floor(float a)
+{
+	return a;
+}
+
+SECTION(TEXTURE_TRIANGLE_SECTION)
+float fabs(float a)
+{
+	return a;
+}
+
+SECTION(TEXTURE_TRIANGLE_SECTION)
+int log2(int a)
+{
+	return a;
+}
+
+SECTION(TEXTURE_TRIANGLE_SECTION)
+float log2f(float a)
+{
+	return a;
+}
+
+SECTION(TEXTURE_TRIANGLE_SECTION)
+float fmax(float a, float b)
+{
+	return (b > a) ? b : a;
 }
 
 /* Compare two floats, 1 if are equal, 0 - otherwise */
@@ -90,12 +162,12 @@ SECTION(TEXTURE_TRIANGLE_SECTION)
 int getPixelValue(unsigned int x, unsigned int y, TexImage2D image, color * pixelValue)
 {
 
-    unsigned int rowDataSize = 0;
-    unsigned int rawDataSize = 0;
-    unsigned int rowPadding = 0;
-    unsigned int bmpFileSize = 0;
-    unsigned int bitsInPixel = 24;
-    unsigned int bytesInPixel = 0;
+    unsigned int rowDataSize = (unsigned int)0;
+    unsigned int rawDataSize = (unsigned int)0;
+    unsigned int rowPadding = (unsigned int)0;
+    unsigned int bmpFileSize = (unsigned int)0;
+    unsigned int bitsInPixel = (unsigned int)24;
+    unsigned int bytesInPixel = (unsigned int)0;
     
     unsigned int width = image.width;
     unsigned int height = image.height;
@@ -114,82 +186,97 @@ int getPixelValue(unsigned int x, unsigned int y, TexImage2D image, color * pixe
 	switch (format)
 	{
 		case NMGL_RGB:
-		  bytesInPixel = 3;
+		  bytesInPixel = (unsigned int)3;
 		  break;
-	
+#if 0	
 		case NMGL_RGBA:
-		  bytesInPixel = 4;
+		  bytesInPixel = (unsigned int)4;
 		  break;
 	
 		case NMGL_ALPHA:
 		case NMGL_LUMINANCE:
-		  bytesInPixel = 1;
+		  bytesInPixel = (unsigned int)1;
 		  break;
 	
 		case NMGL_LUMINANCE_ALPHA:
-		  bytesInPixel = 2;
+		  bytesInPixel = (unsigned int)2;
 		  break;
-		  
+#endif 
 		default:
-		  bytesInPixel = 3;
+		  bytesInPixel = (unsigned int)3;
 	
 		  break;
 	}
 
-	int rowPaddingBytes = (width * bytesInPixel) % alignment ? alignment - (width * bytesInPixel) % alignment : 0;	
-	unsigned int imageRowWidthBytes = width * bytesInPixel + rowPaddingBytes; 
+	int rowPaddingBytes = (int)((width * bytesInPixel) % alignment ? alignment - (width * bytesInPixel) % alignment : (int)0);	
+	unsigned int imageRowWidthBytes = (unsigned int)(width * bytesInPixel + rowPaddingBytes); 
 
-	unsigned int pixelPos = y * imageRowWidthBytes + x * bytesInPixel;
+	// printf("%ч\n",y);
+	
+	// unsigned int pixelPos = (unsigned int)(y * imageRowWidthBytes + x * bytesInPixel); //does not work
+	unsigned int pixelPos = (unsigned int)(y);
 
+#if 1
     if ((format == NMGL_RGB) && (type == NMGL_UNSIGNED_BYTE))
     {
+		// printf ("%x\n",(int)pixels);
         //Чтение производится из массива данных изображения bmp с учетом наличия в нём 
         //дополнительных байтов для выравнивания по границе 4 байтов
-        pixelValue->r = ((unsigned char*)pixels)[pixelPos];
-        pixelValue->g = ((unsigned char*)pixels)[pixelPos + 1];
-        pixelValue->b = ((unsigned char*)pixels)[pixelPos + 2];
-		pixelValue->a = 255;
+        pixelValue->r = (unsigned char)((unsigned char*)pixels)[pixelPos];
+        pixelValue->g = (unsigned char)((unsigned char*)pixels)[pixelPos + (unsigned int)1];
+        pixelValue->b = (unsigned char)((unsigned char*)pixels)[pixelPos + (unsigned int)2];
+		pixelValue->a = (unsigned char)255;
     }
     else if (((format == NMGL_RGBA) && (type == NMGL_UNSIGNED_BYTE)))
     {
         //Чтение производится из массива данных изображения bmp с учетом наличия в нём 
         //дополнительных байтов для выравнивания по границе 4 байтов
-        pixelValue->r = ((unsigned char*)pixels)[pixelPos];
-        pixelValue->g = ((unsigned char*)pixels)[pixelPos + 1];
-        pixelValue->b = ((unsigned char*)pixels)[pixelPos + 2];
-        pixelValue->a = ((unsigned char*)pixels)[pixelPos + 3];
+        pixelValue->r = (unsigned char)((unsigned char*)pixels)[pixelPos];
+        pixelValue->g = (unsigned char)((unsigned char*)pixels)[pixelPos + (unsigned int)1];
+        pixelValue->b = (unsigned char)((unsigned char*)pixels)[pixelPos + (unsigned int)2];
+		pixelValue->a = (unsigned char)255;
     }
+#endif //0
+#if 0
     else if ((format == NMGL_ALPHA) && (type == NMGL_UNSIGNED_BYTE))
     {
         //Чтение производится из массива данных изображения bmp с учетом наличия в нём 
         //дополнительных байтов для выравнивания по границе 4 байтов
-        pixelValue->r = 0;
-        pixelValue->g = 0;
-        pixelValue->b = 0;
-        pixelValue->a = ((unsigned char*)pixels)[pixelPos];
+        pixelValue->r = (unsigned char)0;
+        pixelValue->g = (unsigned char)0;
+        pixelValue->b = (unsigned char)0;
+        pixelValue->a = (unsigned char)((unsigned char*)pixels)[pixelPos];
     }
     else if ((format == NMGL_LUMINANCE) && (type == NMGL_UNSIGNED_BYTE))
     {
         //Чтение производится из массива данных изображения bmp с учетом наличия в нём 
         //дополнительных байтов для выравнивания по границе 4 байтов
-        pixelValue->r = ((unsigned char*)pixels)[pixelPos];
-        pixelValue->g = ((unsigned char*)pixels)[pixelPos];
-        pixelValue->b = ((unsigned char*)pixels)[pixelPos];
-        pixelValue->a = 255;
+        pixelValue->r = (unsigned char)((unsigned char*)pixels)[pixelPos];
+        pixelValue->g = (unsigned char)((unsigned char*)pixels)[pixelPos];
+        pixelValue->b = (unsigned char)((unsigned char*)pixels)[pixelPos];
+        pixelValue->a = (unsigned char)255;
     }
     else if ((format == NMGL_LUMINANCE_ALPHA) && (type == NMGL_UNSIGNED_BYTE))
     {
         //Чтение производится из массива данных изображения bmp с учетом наличия в нём 
         //дополнительных байтов для выравнивания по границе 4 байтов
-        pixelValue->r = ((unsigned char*)pixels)[pixelPos];
-        pixelValue->g = ((unsigned char*)pixels)[pixelPos];
-        pixelValue->b = ((unsigned char*)pixels)[pixelPos];
-        pixelValue->a = ((unsigned char*)pixels)[pixelPos + 1];
+        pixelValue->r = (unsigned char)((unsigned char*)pixels)[pixelPos];
+        pixelValue->g = (unsigned char)((unsigned char*)pixels)[pixelPos];
+        pixelValue->b = (unsigned char)((unsigned char*)pixels)[pixelPos];
+        pixelValue->a = (unsigned char)((unsigned char*)pixels)[pixelPos + (unsigned int)1];
     }
     else
     {
         printf ("Error: %s %s %d", __FILE__, __func__, __LINE__);
     }
+#endif //0  //test 08072020
+
+#if 0
+	pixelValue->r = 0x00; //test 08072020
+	pixelValue->g = 0xff; //test 08072020
+	pixelValue->b = 0xff; //test 08072020
+	pixelValue->a = 0xFF; //test 08072020
+#endif //0
     return 0;
 }
 
@@ -221,6 +308,7 @@ float wrapCoord (NMGLint textureWrapMode, int texAxisSize, float texCoord)
 	return resTexCoord;
 }
 
+#if 0
 SECTION(TEXTURE_TRIANGLE_SECTION)   
 color getPixelLinear(Vec2f st, NMGLint textureWrapS, NMGLint textureWrapT, TexImage2D texture)
 {
@@ -317,6 +405,7 @@ color getPixelLinear(Vec2f st, NMGLint textureWrapS, NMGLint textureWrapT, TexIm
 
 	return pixelValue;//TODO return by pointer
 }
+#endif //0
 
 SECTION(TEXTURE_TRIANGLE_SECTION)
 color getPixelNearest(Vec2f st, TexImage2D texture)
@@ -324,7 +413,7 @@ color getPixelNearest(Vec2f st, TexImage2D texture)
 
 	unsigned int texel_i = 0;
 	unsigned int texel_j = 0;
-	color pixelValue;
+	//color pixelValue; //moved to global scope
 
 
 	float u = texture.width*st.x; //2^n = textureWidth
@@ -341,7 +430,7 @@ color getPixelNearest(Vec2f st, TexImage2D texture)
 
 SECTION(TEXTURE_TRIANGLE_SECTION)
 void textureTriangle(Pattern* patterns, 
-                 Triangles* triangles,
+                 TrianglesInfo* triangles,
                  nm32s** pROI,
                  Rectangle* windows, 
                  nm32s* pSrcTriangle, 
@@ -350,6 +439,7 @@ void textureTriangle(Pattern* patterns,
 {
 #ifdef TEXTURE_ENABLED
 
+#if 1
 #ifdef DEBUG
     // printf ("Start textureTriangle\n"); 
 #endif //DEBUG
@@ -363,18 +453,18 @@ void textureTriangle(Pattern* patterns,
     TexObject* boundTexObject = cntxt.texState.texUnits[activeTexUnitIndex].boundTexObject;
     
     float scaleFactor = 1.0;
-	borderColor.r = 0.0f;
-	borderColor.g = 0.0f;
-	borderColor.b = 0.0f;
-	borderColor.a = 0.0f;
+	borderColor.r = (nm32f)0.0f;
+	borderColor.g = (nm32f)0.0f;
+	borderColor.b = (nm32f)0.0f;
+	borderColor.a = (nm32f)0.0f;
     
-    color pixelValue;
-	pixelValue.r = 0;
-	pixelValue.g = 0;
-	pixelValue.b = 0;
+    // color pixelValue; //moved to global scope 08072020
+	pixelValue.r = (nm32f)0;
+	pixelValue.g = (nm32f)0;
+	pixelValue.b = (nm32f)0;
     
     //texEnvColor consists of rgb + alpha
-    Vec3f texEnvColor;
+    //Vec3f texEnvColor;//moved to gloabal scope 08072020
     float texEnvColorAlpha;
 	texEnvColor.x = cntxt.texState.texUnits[activeTexUnitIndex].texEnvColor[0];
 	texEnvColor.y = cntxt.texState.texUnits[activeTexUnitIndex].texEnvColor[1];
@@ -383,10 +473,10 @@ void textureTriangle(Pattern* patterns,
 
 	//primitive color (glColor3f)
 	Vec3f vertexRGB;
-	vertexRGB.x = 1.0;
-	vertexRGB.y = 1.0;
-	vertexRGB.z = 1.0;
-	float vertexAlpha = 1.0;
+	vertexRGB.x = (nm32f)1.0;
+	vertexRGB.y = (nm32f)1.0;
+	vertexRGB.z = (nm32f)1.0;
+	nm32f vertexAlpha = (nm32f)1.0;
 
 
     NMGLint textureMinFilter = boundTexObject->texMinFilter; //default NEAREST_MIPMAP_LINEAR
@@ -403,13 +493,14 @@ void textureTriangle(Pattern* patterns,
 	int m = log2(boundTexObject->texImages2D[0].height);
 	int p = max(n,m) + TEXTURE_BASE_LEVEL; //p = max{n,m,l} + TEXTURE_BASE_LEVEL
 	int q = min(p,TEXTURE_MAX_LEVEL);//min{p,TEXTURE_MAX_LEVEL} page 140, glspec 1.3
+#endif //0
     
     long long int temp;
     nm32s* dst = pDstTriangle;
     nm32s* src = pSrcTriangle;
     int winX0 = 0;
     int winY0 = 0;
-    
+
     for(int cnt=0;cnt<count;cnt++){
         nm64s* pattern = (nm64s*) (patterns + cnt);
         pattern += windows[cnt].y;
@@ -530,7 +621,6 @@ void textureTriangle(Pattern* patterns,
         float oneOverArea = 1.0/area;
         int pixelCnt = 0;
         
-        
         for(int y = 0; y < windows[cnt].height; y++){
             temp = pattern[y];
             nm32s* pDst = (nm32s*)(dst + y * windows[cnt].width);
@@ -551,6 +641,8 @@ void textureTriangle(Pattern* patterns,
 
                 if (mul > 0)//pixel belongs to triangle
                 {
+#if 1
+
                     //Calculate x and y of current pixel as float values
                     //relative to triangle vertex coordinates inside segment
                     float xf = winX0 + x + 0.5f; 
@@ -614,7 +706,7 @@ void textureTriangle(Pattern* patterns,
                     t = A_t*xf + B_t*yf + D_t;
 #endif //PERSPECTIVE_CORRECT
 #endif //USE_BARYCENTRIC
-                    Vec2f st;
+                    // Vec2f st; //moved to global scope
                     st.x = s;
                     st.y = t;
 
@@ -698,8 +790,12 @@ void textureTriangle(Pattern* patterns,
 							st.x = wrapCoord(textureWrapS, boundTexObject->texImages2D[0].width, st.x);
 							st.y = wrapCoord(textureWrapT, boundTexObject->texImages2D[0].height, st.y);
 
+							//pixelValue = getPixelNearest(st, boundTexObject->texImages2D[0]);
 							pixelValue = getPixelNearest(st, boundTexObject->texImages2D[0]);
 						}
+#endif //0
+
+#if 0 //if you uncomment first "if" then program will freeze, bit without getPixelNearest call it will work. May be it is because of local structure variable st passed to getPixelNearest
 						else if (((minMagFlag == MINIFICATION) && (textureMinFilter == NMGL_LINEAR)) ||
 							((minMagFlag == MAGNIFICATION) && (textureMagFilter == NMGL_LINEAR)))
 						{
@@ -798,48 +894,49 @@ void textureTriangle(Pattern* patterns,
 							getchar();
                             return;
 						}
-                        
+#endif //0
+
 						//Apply texture finction
 						//RGB value
-						Vec3f cf; //primary color components of the incoming fragment (primary color of PRIMITIVE pixel OR fragment color from previous texture unit)
+						Vec3f cf_; //primary color components of the incoming fragment (primary color of PRIMITIVE pixel OR fragment color from previous texture unit)
 								  //Not framebuffer color.Framebuffer color can be used at another stage called Blending (glBlendFunc...)
-						Vec3f cs; //texture source color (color from texture array, one tex unit - one texture)
-						Vec3f cc; //texture environment color (unique for each texture unit)
-						Vec3f cv; //primary color components computed by the texture function (to another OpenGL stages or to next texture unit)
+						Vec3f cs_; //texture source color (color from texture array, one tex unit - one texture)
+						Vec3f cc_; //texture environment color (unique for each texture unit)
+						Vec3f cv_; //primary color components computed by the texture function (to another OpenGL stages or to next texture unit)
 
 						//Alpha value
-						float af; 
-						float as;
-						float ac; 
-						float av;
+						nm32f af; 
+						nm32f as;
+						nm32f ac; 
+						nm32f av;
                         
 						//(nm32s)pSrc[0] = 0xARGB
-                        vertexRGB.x = ((pSrc[0] >> 16 ) & 0xff)/255.0;//r
-                        vertexRGB.y = ((pSrc[0] >> 8) & 0xff)/255.0;//g
-                        vertexRGB.z = (pSrc[0] & 0xff)/255.0;//b
-                        vertexAlpha = (((pSrc[0]) >> 24) & 0xff)/255.0;//a
+                        vertexRGB.x = (nm32f)((pSrc[0] >> 16 ) & 0xff)/255.0;//r
+                        vertexRGB.y = (nm32f)((pSrc[0] >> 8) & 0xff)/255.0;//g
+                        vertexRGB.z = (nm32f)(pSrc[0] & 0xff)/255.0;//b
+                        vertexAlpha = (nm32f)(((pSrc[0]) >> 24) & 0xff)/255.0;//a
 
 						//TODO: extra assignment. name vertexRGB is umbiguous and unnecessary.
-						cf.x = vertexRGB.x;
-						cf.y = vertexRGB.y;
-						cf.z = vertexRGB.z;
+						cf.x = (nm32f)vertexRGB.x;
+						cf.y = (nm32f)vertexRGB.y;
+						cf.z = (nm32f)vertexRGB.z;
 
-						cs.x = (float)pixelValue.r/255.0;
-						cs.y = (float)pixelValue.g/255.0;
-						cs.z = (float)pixelValue.b/255.0;
+						cs.x = (nm32f)pixelValue.r/255.0;
+						cs.y = (nm32f)pixelValue.g/255.0;
+						cs.z = (nm32f)pixelValue.b/255.0;
 
-						cc.x = texEnvColor.x;
-						cc.y = texEnvColor.y;
-						cc.z = texEnvColor.z;
+						cc.x = (nm32f)texEnvColor.x;
+						cc.y = (nm32f)texEnvColor.y;
+						cc.z = (nm32f)texEnvColor.z;
 
-						cv.x = 0.0;
-						cv.y = 0.0;
-						cv.z = 0.0;
+						cv.x = (nm32f)0.0;
+						cv.y = (nm32f)0.0;
+						cv.z = (nm32f)0.0;
 
-						af = vertexAlpha;
-						as = (float)pixelValue.a/255.0;  
-						ac = texEnvColorAlpha;
-						av = 0.0;
+						af = (nm32f)vertexAlpha;
+						as = (nm32f)pixelValue.a/255.0;  
+						ac = (nm32f)texEnvColorAlpha;
+						av = (nm32f)0.0;
 
 						switch (texBaseInternalFormat)
 						{
@@ -847,77 +944,76 @@ void textureTriangle(Pattern* patterns,
 							switch (texEnvMode)
 							{
 								case NMGL_REPLACE:
-									cv.x = cs.x;
-									cv.y = cs.y;
-									cv.z = cs.z;
-									av = af;
+									cv.x = (nm32f)cs.x;
+									cv.y = (nm32f)cs.y;
+									cv.z = (nm32f)cs.z;
+									av = (nm32f)af;
 									break;
 
 								case NMGL_MODULATE:
-									cv.x = cf.x * cs.x;
-									cv.y = cf.y * cs.y;
-									cv.z = cf.z * cs.z;
-									av = af;
+									cv.x = (nm32f)(cf.x * cs.x);
+									cv.y = (nm32f)(cf.y * cs.y);
+									cv.z = (nm32f)(cf.z * cs.z);
+									av = (nm32f)af;
 									break;
 
 								case NMGL_DECAL:
-									cv.x = cs.x;
-									cv.y = cs.y;
-									cv.z = cs.z;
-									av = af;
+									cv.x = (nm32f)cs.x;
+									cv.y = (nm32f)cs.y;
+									cv.z = (nm32f)cs.z;
+									av = (nm32f)af;
 									break;
-
 								case NMGL_BLEND:
-									cv.x = cf.x * (1.0 - cs.x) + cc.x * cs.x;
-									cv.y = cf.y * (1.0 - cs.y) + cc.y * cs.y;
-									cv.z = cf.z * (1.0 - cs.z) + cc.z * cs.z;
-									av = af;
+									cv.x = (nm32f)(cf.x * ((nm32f)1.0 - cs.x) + cc.x * cs.x);
+									cv.y = (nm32f)(cf.y * ((nm32f)1.0 - cs.y) + cc.y * cs.y);
+									cv.z = (nm32f)(cf.z * ((nm32f)1.0 - cs.z) + cc.z * cs.z);
+									av = (nm32f)af;
 									break;
 
 								case NMGL_ADD:
-									cv.x = cf.x + cs.x;
-									cv.y = cf.y + cs.y;
-									cv.z = cf.z + cs.z;
-									av = af;
+									cv.x = (nm32f)(cf.x + cs.x);
+									cv.y = (nm32f)(cf.y + cs.y);
+									cv.z = (nm32f)(cf.z + cs.z);
+									av = (nm32f)af;
 									break;
 							}
 							break;
+#if 0
 						case NMGL_RGBA:
 							switch (texEnvMode)
 							{
 								case NMGL_REPLACE:
-									cv.x = cs.x;
-									cv.y = cs.y;
-									cv.z = cs.z;
-									av = as;
+									cv.x = (nm32f)cs.x;
+									cv.y = (nm32f)cs.y;
+									cv.z = (nm32f)cs.z;
+									av = (nm32f)as;
 									break;
-
 								case NMGL_MODULATE:
-									cv.x = cf.x * cs.x;
-									cv.y = cf.y * cs.y;
-									cv.z = cf.z * cs.z;
-									av = af * as;
+									cv.x = (nm32f)(cf.x * cs.x);
+									cv.y = (nm32f)(cf.y * cs.y);
+									cv.z = (nm32f)(cf.z * cs.z);
+									av = (nm32f)(af * as);
 									break;
 
 								case NMGL_DECAL:
-								  	cv.x = cf.x * (1.0 - as) + cs.x * as;
-									cv.y = cf.y * (1.0 - as) + cs.y * as;
-									cv.z = cf.z * (1.0 - as) + cs.z * as;
-									av = af;
+								  	cv.x = (nm32f)(cf.x * ((nm32f)1.0 - as) + cs.x * as);
+									cv.y = (nm32f)(cf.y * ((nm32f)1.0 - as) + cs.y * as);
+									cv.z = (nm32f)(cf.z * ((nm32f)1.0 - as) + cs.z * as);
+									av = (nm32f)af;
 									break;
 
 								case NMGL_BLEND:
-									cv.x = cf.x * (1.0 - cs.x) + cc.x * cs.x;
-									cv.y = cf.y * (1.0 - cs.y) + cc.y * cs.y;
-									cv.z = cf.z * (1.0 - cs.z) + cc.z * cs.z;
-									av = af * as;
+									cv.x = (nm32f)(cf.x * ((nm32f)1.0 - cs.x) + cc.x * cs.x);
+									cv.y = (nm32f)(cf.y * ((nm32f)1.0 - cs.y) + cc.y * cs.y);
+									cv.z = (nm32f)(cf.z * ((nm32f)1.0 - cs.z) + cc.z * cs.z);
+									av = (nm32f)(af * as);
 									break;
 
 								case NMGL_ADD:
-									cv.x = cf.x + cs.x;
-									cv.y = cf.y + cs.y;
-									cv.z = cf.z + cs.z;
-									av = af * as;
+									cv.x = (nm32f)(cf.x + cs.x);
+									cv.y = (nm32f)(cf.y + cs.y);
+									cv.z = (nm32f)(cf.z + cs.z);
+									av = (nm32f)(af * as);
 									break;
 							}
 							break;
@@ -926,38 +1022,38 @@ void textureTriangle(Pattern* patterns,
 							switch (texEnvMode)
 							{
 								case NMGL_REPLACE:
-									cv.x = cf.x;
-									cv.y = cf.y;
-									cv.z = cf.z;
-									av = as;
+									cv.x = (nm32f)cf.x;
+									cv.y = (nm32f)cf.y;
+									cv.z = (nm32f)cf.z;
+									av = (nm32f)as;
 									break;
 
 								case NMGL_MODULATE:
-									cv.x = cf.x;
-									cv.y = cf.y;
-									cv.z = cf.z;
-									av = af * as;
+									cv.x = (nm32f)cf.x;
+									cv.y = (nm32f)cf.y;
+									cv.z = (nm32f)cf.z;
+									av = (nm32f)(af * as);
 									break;
 
 								case NMGL_DECAL://undefined
-								  	cv.x = 1.0;
-									cv.y = 1.0;
-									cv.z = 1.0;
-									av = 1.0;
+								  	cv.x = (nm32f)1.0;
+									cv.y = (nm32f)1.0;
+									cv.z = (nm32f)1.0;
+									av = (nm32f)1.0;
 									break;
 
 								case NMGL_BLEND:
-									cv.x = cf.x;
-									cv.y = cf.y;
-									cv.z = cf.z;
-									av = af * as;
+									cv.x = (nm32f)cf.x;
+									cv.y = (nm32f)cf.y;
+									cv.z = (nm32f)cf.z;
+									av = (nm32f)(af * as);
 									break;
 
 								case NMGL_ADD:
-	 							    	cv.x = cf.x;
-									cv.y = cf.y;
-									cv.z = cf.z;
-									av = af * as;
+	 							    cv.x = (nm32f)cf.x;
+									cv.y = (nm32f)cf.y;
+									cv.z = (nm32f)cf.z;
+									av = (nm32f)(af * as);
 									break;
 							}
 							break;
@@ -965,38 +1061,38 @@ void textureTriangle(Pattern* patterns,
 							switch (texEnvMode)
 							{
 								case NMGL_REPLACE:
-									cv.x = cs.x;
-									cv.y = cs.y;
-									cv.z = cs.z;
-									av = af;
+									cv.x = (nm32f)cs.x;
+									cv.y = (nm32f)cs.y;
+									cv.z = (nm32f)cs.z;
+									av = (nm32f)af;
 									break;
 
 								case NMGL_MODULATE:
-									cv.x = cf.x * cs.x;
-									cv.y = cf.y * cs.y;
-									cv.z = cf.z * cs.z;
-									av = af;
+									cv.x = (nm32f)(cf.x * cs.x);
+									cv.y = (nm32f)(cf.y * cs.y);
+									cv.z = (nm32f)(cf.z * cs.z);
+									av = (nm32f)af;
 									break;
 
 								case NMGL_DECAL://undefined
-									cv.x = 1.0;
-									cv.y = 1.0;
-									cv.z = 1.0;
-									av = 1.0;
+									cv.x = (nm32f)1.0;
+									cv.y = (nm32f)1.0;
+									cv.z = (nm32f)1.0;
+									av = (nm32f)1.0;
 									break;
 
 								case NMGL_BLEND:
-									cv.x = cf.x * (1.0 - cs.x) + cc.x * cs.x;
-									cv.y = cf.y * (1.0 - cs.y) + cc.y * cs.y;
-									cv.z = cf.z * (1.0 - cs.z) + cc.z * cs.z;
-									av = af;
+									cv.x = (nm32f)(cf.x * ((nm32f)1.0 - cs.x) + cc.x * cs.x);
+									cv.y = (nm32f)(cf.y * ((nm32f)1.0 - cs.y) + cc.y * cs.y);
+									cv.z = (nm32f)(cf.z * ((nm32f)1.0 - cs.z) + cc.z * cs.z);
+									av = (nm32f)af;
 									break;
 
 								case NMGL_ADD:
-									cv.x = cf.x + cs.x;
-									cv.y = cf.y + cs.y;
-									cv.z = cf.z + cs.z;
-									av = af;
+									cv.x = (nm32f)(cf.x + cs.x);
+									cv.y = (nm32f)(cf.y + cs.y);
+									cv.z =(nm32f)(cf.z + cs.z);
+									av = (nm32f)af;
 									break;
 							}
 							break;
@@ -1004,46 +1100,47 @@ void textureTriangle(Pattern* patterns,
 							switch (texEnvMode)
 							{
 								case NMGL_REPLACE:
-									cv.x = cs.x;
-									cv.y = cs.y;
-									cv.z = cs.z;
-									av = as;
+									cv.x = (nm32f)cs.x;
+									cv.y = (nm32f)cs.y;
+									cv.z = (nm32f)cs.z;
+									av = (nm32f)as;
 									break;
 
 								case NMGL_MODULATE:
-									cv.x = cf.x * cs.x;
-									cv.y = cf.y * cs.y;
-									cv.z = cf.z * cs.z;
-									av = af * as;
+									cv.x = (nm32f)(cf.x * cs.x);
+									cv.y = (nm32f)(cf.y * cs.y);
+									cv.z = (nm32f)(cf.z * cs.z);
+									av = (nm32f)(af * as);
 									break;
 
 								case NMGL_DECAL://undefined
-									cv.x = 1.0;
-									cv.y = 1.0;
-									cv.z = 1.0;
-									av = 1.0;
+									cv.x = (nm32f)1.0;
+									cv.y = (nm32f)1.0;
+									cv.z = (nm32f)1.0;
+									av = (nm32f)1.0;
 									break;
 
 								case NMGL_BLEND:
-									cv.x = cf.x * (1.0 - cs.x) + cc.x * cs.x;
-									cv.y = cf.y * (1.0 - cs.y) + cc.y * cs.y;
-									cv.z = cf.z * (1.0 - cs.z) + cc.z * cs.z;
-									av = af * as;
+									cv.x = (nm32f)(cf.x * ((nm32f)1.0 - cs.x) + cc.x * cs.x);
+									cv.y = (nm32f)(cf.y * ((nm32f)1.0 - cs.y) + cc.y * cs.y);
+									cv.z = (nm32f)(cf.z * ((nm32f)1.0 - cs.z) + cc.z * cs.z);
+									av = (nm32f)(af * as);
 									break;
 
 								case NMGL_ADD:
-									cv.x = cf.x + cs.x;
-									cv.y = cf.y + cs.y;
-									cv.z = cf.z + cs.z;
-									av = af * as;
+									cv.x = (nm32f)(cf.x + cs.x);
+									cv.y = (nm32f)(cf.y + cs.y);
+									cv.z = (nm32f)(cf.z + cs.z);
+									av = (nm32f)(af * as);
 									break;
 							}
 							break;
+#endif //0
 					        default:
 							printf ("Unsupported internal format\n");
 							break;
 						}
-						  
+
                     nm32s color = 0;
 					//(nm32s)pDst[0] = 0xARGB
 					color = color | (((nm32s)(av * 255) & 0xff) << 24);//a
@@ -1077,3 +1174,4 @@ void edgeFunction(float x0, float y0, float x1, float y1, float x2, float y2, fl
     *res = (x2 - x0) * (y1 - y0) - (y2 - y0) * (x1 - x0);
 }
 #endif //TEXTURE_ENABLED
+#endif //0

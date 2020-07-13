@@ -46,9 +46,11 @@ void rasterizeT(const Triangles* triangles, const BitMask* masks){
 	for (int segY = 0, iSeg = 0; segY < cntxt.windowInfo.nRows; segY++) {
 		for (int segX = 0; segX < cntxt.windowInfo.nColumns; segX++, iSeg++) {
 			if (masks[iSeg].hasNotZeroBits != 0) {
+				//printf("segment has not zero bits. segX = %d segY = %d \n", segX, segY);
 
 				int resultSize = readMask(masks[iSeg].bits, indices, count);
 				if (resultSize) {
+					// printf("resultSize = %d segX = %d segY = %d \n", resultSize, segX, segY);
 					cntxt.synchro.writeInstr(1, NMC1_COPY_SEG_FROM_IMAGE,
 						cntxt.windowInfo.x0[segX],
 						cntxt.windowInfo.y0[segY],
@@ -56,6 +58,7 @@ void rasterizeT(const Triangles* triangles, const BitMask* masks){
 						cntxt.windowInfo.y1[segY] - cntxt.windowInfo.y0[segY],
 						iSeg);
 					if (cntxt.texState.textureEnabled){
+						// copyArraysByIndices((void**)triangles, indices, (void**)&localTrian, 14, resultSize);
 						copyArraysByIndices((void**)triangles, indices, (void**)&localTrian, 14, resultSize);
 					} else {
 						copyArraysByIndices((void**)triangles, indices, (void**)&localTrian, 7, resultSize);
@@ -66,16 +69,18 @@ void rasterizeT(const Triangles* triangles, const BitMask* masks){
 					while (connector.isFull());
 					Polygons* poly = connector.ptrHead();
 					poly->count = 0;
+					// printf("%s %d \n",__func__, __LINE__);
 					updatePolygonsT(poly, &localTrian, resultSize, segX, segY);
 					connector.incHead();
 					cntxt.synchro.writeInstr(1, NMC1_DRAW_TRIANGLES);
-
+					// printf("%s %d \n",__func__, __LINE__);
 					cntxt.synchro.writeInstr(1,
 						NMC1_COPY_SEG_TO_IMAGE,
 						cntxt.windowInfo.x0[segX],
 						cntxt.windowInfo.y0[segY],
 						cntxt.windowInfo.x1[segX] - cntxt.windowInfo.x0[segX],
 						cntxt.windowInfo.y1[segY] - cntxt.windowInfo.y0[segY]);
+					// printf("%s %d \n",__func__, __LINE__);
 				}				
 			}
 		}

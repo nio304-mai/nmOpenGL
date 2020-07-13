@@ -15,7 +15,7 @@
 /**
 \brief Структура для хранения параметров треугольников
 */
-struct Triangles{
+struct TrianglesInfo{
     //Поля структуры для коммита 2fbdfcc0 nmOpenGLs
 	float* x0; /**< Оконная координата x 0-ой вершины треугольника */
 	float* y0; /**< Оконная координата y 0-ой вершины треугольника */
@@ -67,14 +67,14 @@ void edgeFunction(float x0, float y0, float x1, float y1, float x2, float y2, fl
 \param pDstTriangle [out] Выходной массив цветов треугольников
 \param count [in] Число треугольников
 \retval void
-*/
-void textureTriangle(Pattern* patterns, 
-                 Triangles* triangles,
-                 nm32s** pROI,
-                 Rectangle* windows, 
-                 nm32s* pSrcTriangle, 
-                 nm32s* pDstTriangle, 
-                 int count);
+//*/
+//int textureTriangle(Pattern* patterns, 
+//                 TrianglesInfo* triangles,
+//                 nm32s** pROI,
+//                 Rectangle* windows, 
+//                 nm32s* pSrcTriangle, 
+//                 nm32s* pDstTriangle, 
+//                 int count);
 
 
 

@@ -19,8 +19,16 @@
 #define HEAD_T1 (triangles.t1)
 #define HEAD_S2 (triangles.s2)
 #define HEAD_T2 (triangles.t2)
-#define HEAD_Z_EYE  (triangles.zEye )
+#define HEAD_Z_EYE  (triangles.zEye)
 #endif //TEXTURE_ENABLED
+
+union intfloat_t
+{
+    float fl;
+    unsigned int uinteg;
+};
+
+SECTION(".data_imu0") intfloat_t texdata;
 
 
 SECTION(".text_demo3d")
@@ -61,6 +69,24 @@ void pushToTriangles_t(const float *vertexX, const float *vertexY, const float *
 		split_v4nm32f((v4nm32f*)cntxt.buffer3, 1, HEAD_T0, HEAD_T1, HEAD_T2, cntxt.buffer3 + 6 * NMGL_SIZE, countPrim);
 		
     	nmblas_scopy(countPrim, vertexZEye, 1, HEAD_Z_EYE, 1);
+    	// nmblas_scopy(countPrim, (float*)cntxt.buffer3, 4, HEAD_S0, 1); //remove if not only s0
+    	// nmblas_scopy(countPrim, vertexT, 3, HEAD_T0, 1); //remove if not only s0
+    	// nmblas_scopy(countPrim, (float*)cntxt.buffer3 + 3, 4, HEAD_S1, 1); //remove if not only s0
+        // for (int trCnt = 0; trCnt < countPrim; trCnt++){
+				// *((float*)HEAD_S1 + trCnt) = *((float*)cntxt.buffer3 + 1 + 4*trCnt);
+			// }
+
+			// printf ("*****nm0***** %x \n", sizeof(float));
+			// for (int trCnt = 0; trCnt < countPrim*4; trCnt++){
+				// texdata.fl = ((float*)cntxt.buffer3)[trCnt];
+				// printf ("nm0 %x %x \n",trCnt, texdata.uinteg);
+			// }
+			// for (int trCnt = 0; trCnt < countPrim; trCnt++){
+				// texdata.fl = ((float*)HEAD_S1)[trCnt];
+				// printf ("nm0 HEAD_S1 %x %x \n",trCnt, texdata.uinteg);
+			// }
+		
+		
     }
 #endif //TEXTURE_ENABLED
 

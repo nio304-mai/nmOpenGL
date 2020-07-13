@@ -27,7 +27,7 @@
 /**
 * Максимальное количество текстурных объектов.
 */
-#define NMGL_MAX_TEX_OBJECTS 4
+#define NMGL_MAX_TEX_OBJECTS 2
 
 
 /**

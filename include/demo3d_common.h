@@ -33,7 +33,7 @@ typedef v4nm8s rgb8888;
 #define HEIGHT_SEG 128
 
 #ifdef TEXTURE_ENABLED
-#define NMGL_SIZE 256 
+#define NMGL_SIZE 256 //256 for release, 128 for debug
 #else //TEXTURE_ENABLE
 #define NMGL_SIZE 1024 
 #endif //TEXTURE_ENABLED
@@ -101,14 +101,13 @@ struct Polygons {
 	float y1[POLYGONS_SIZE];
 	float x2[POLYGONS_SIZE];
 	float y2[POLYGONS_SIZE];
-	float zEye[POLYGONS_SIZE];
-	
 	float s0[POLYGONS_SIZE];
 	float t0[POLYGONS_SIZE];
 	float s1[POLYGONS_SIZE];
 	float t1[POLYGONS_SIZE];
 	float s2[POLYGONS_SIZE];
 	float t2[POLYGONS_SIZE];
+	float zEye[POLYGONS_SIZE];
 #endif //TEXTURE_ENABLED 
 	int color[4 * POLYGONS_SIZE];
 
@@ -117,7 +116,6 @@ struct Polygons {
 	//Rectangle ptrnsWindow[POLYGONS_SIZE];
 	int count;
 	int dummy[15];
-	// int dummy[2];
 
 	Polygons() : count(0) {
 		

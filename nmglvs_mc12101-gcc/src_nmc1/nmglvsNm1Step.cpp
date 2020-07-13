@@ -103,6 +103,7 @@ SECTION(".text_nmglvs") int nmglvsNm1Step()
 	}
 	case NMC1_COPY_SEG_FROM_IMAGE:
 	{		
+		// printf("%s %d \n",__func__, __LINE__);
 		int x0 = currentCommand.params[0];
 		int y0 = currentCommand.params[1];
 		int width = currentCommand.params[2];
@@ -116,7 +117,6 @@ SECTION(".text_nmglvs") int nmglvsNm1Step()
 			cntxt.texState.segWidth = width;
 		}
 #endif //TEXTURE_ENABLED
-        
 		if (cntxt.depthBuffer.enabled == NMGL_TRUE) {
 			nm32s* src = nmppsAddr_32s((int*)cntxt.depthBuffer.data, y0 * cntxt.depthBuffer.getWidth() + x0);
 			nm32s* dst = (nm32s*)cntxt.smallDepthBuff.data;
@@ -133,6 +133,7 @@ SECTION(".text_nmglvs") int nmglvsNm1Step()
 	}
 
 	case NMC1_COPY_SEG_TO_IMAGE: {
+		// printf("%s %d \n",__func__, __LINE__);
 		int x0 = currentCommand.params[0];
 		int y0 = currentCommand.params[1];
 		int width = currentCommand.params[2];
@@ -151,6 +152,7 @@ SECTION(".text_nmglvs") int nmglvsNm1Step()
 	}
 
 	case NMC1_DRAW_TRIANGLES: {
+		// printf("%s %d \n",__func__, __LINE__);
 		drawTriangles(&cntxt);
 		break;
 	}

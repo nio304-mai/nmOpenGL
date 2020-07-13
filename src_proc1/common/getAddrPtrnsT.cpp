@@ -28,6 +28,7 @@ SECTION(".text_demo3d") int getAddrPtrnsT(NMGL_Context_NM1* context, Polygons* p
 	nm32s* dydx = nmppsAddr_32s(temp0, NMGL_SIZE);
 	task.type = MSD_DMA;
 	task.callback = 0;
+	
 	ADD_COPY(poly->ptrnSizesOf32_01, polyTmp->ptrnSizesOf32_01, size, 0);
 	ADD_COPY(poly->pointInImage, polyTmp->pointInImage, size, 1);
 	ADD_COPY(poly->widths, polyTmp->widths, size, 2);
@@ -118,23 +119,35 @@ SECTION(".text_demo3d") int getAddrPtrnsT(NMGL_Context_NM1* context, Polygons* p
 		(nm32s**)context->nSizePtrn32,
 	 size);
 
+		// CHECK_STATUS(0);ADD_COPY(poly->x0, context->x0, size, 0); CHECK_STATUS(0);
+		// CHECK_STATUS(1);ADD_COPY(poly->y0, context->y0, size, 1);CHECK_STATUS(1);
+		// CHECK_STATUS(2);ADD_COPY(poly->x1, context->x1, size, 2);CHECK_STATUS(2);
+		// CHECK_STATUS(3);ADD_COPY(poly->y1, context->y1, size, 3);CHECK_STATUS(3);
+		// CHECK_STATUS(4);ADD_COPY(poly->x2, context->x2, size, 4);CHECK_STATUS(4);
+		// CHECK_STATUS(5);ADD_COPY(poly->y2, context->y2, size, 5);CHECK_STATUS(5);
+
+		// CHECK_STATUS(7);ADD_COPY(poly->t0, context->texT0, size, 7);CHECK_STATUS(7);
+		// CHECK_STATUS(8);ADD_COPY(poly->s1, context->texS1, size, 8);CHECK_STATUS(8);
+		// CHECK_STATUS(9);ADD_COPY(poly->t1, context->texT1, size, 9);CHECK_STATUS(9);
+		// CHECK_STATUS(10);ADD_COPY(poly->s2, context->texS2, size, 10);CHECK_STATUS(10);
+		// CHECK_STATUS(11);ADD_COPY(poly->t2, context->texT2, size, 11);CHECK_STATUS(11);
+
+		// CHECK_STATUS(12);ADD_COPY(poly->zEye, context->zEye, size, 12);CHECK_STATUS(12);
+
 #ifdef TEXTURE_ENABLED
 	if (context->texState.textureEnabled){
-		ADD_COPY(poly->x0, context->x0, size, 0);
-		ADD_COPY(poly->y0, context->y0, size, 1);
-		ADD_COPY(poly->x1, context->x1, size, 2);
-		ADD_COPY(poly->y1, context->y1, size, 3);
-		ADD_COPY(poly->x2, context->x2, size, 4);
-		ADD_COPY(poly->y2, context->y2, size, 5);
-
-		ADD_COPY(poly->s0, context->texS0, size, 6);
-		ADD_COPY(poly->t0, context->texT0, size, 7);
-		ADD_COPY(poly->s1, context->texS1, size, 8);
-		ADD_COPY(poly->t1, context->texT1, size, 9);
-		ADD_COPY(poly->s2, context->texS2, size, 10);
-		ADD_COPY(poly->t2, context->texT2, size, 11);
-
-		ADD_COPY(poly->zEye, context->zEye, size, 12);
+		ADD_COPY(poly->s0, context->texS0, size, 0);
+		ADD_COPY(poly->s1, context->texS1, size, 1);
+		ADD_COPY(poly->s2, context->texS2, size, 2);
+		ADD_COPY(poly->t0, context->texT0, size, 3);
+		ADD_COPY(poly->t1, context->texT1, size, 4);
+		ADD_COPY(poly->t2, context->texT2, size, 5);
+		ADD_COPY(poly->x0, context->x0, size, 6);
+		ADD_COPY(poly->y0, context->y0, size, 7);
+		ADD_COPY(poly->x1, context->x1, size, 8);
+		ADD_COPY(poly->y1, context->y1, size, 9);
+		ADD_COPY(poly->x2, context->x2, size, 10);
+		ADD_COPY(poly->y2, context->y2, size, 11);
 	}
 #endif //TEXTURE_ENABLED
 

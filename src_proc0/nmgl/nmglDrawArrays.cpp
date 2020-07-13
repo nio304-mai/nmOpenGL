@@ -112,6 +112,9 @@ void nmglDrawArrays(NMGLenum mode, NMGLint first, NMGLsizei count) {
 			break;
 		}
 		mul_mat4nm32f_v4nm32f(cntxt.modelviewMatrixStack.top(), (v4nm32f*)cntxt.buffer1, vertexResult, localSize);
+		//for (int i = 0; i < localSize; i++){
+		//	printf("X = %f Y = %f Z = %f W = %f\n", ((float*)vertexResult)[i], ((float*)vertexResult)[i+1], ((float*)vertexResult)[i+2], ((float*)vertexResult)[i+3]);
+		//}
 
 #ifdef TEXTURE_ENABLED
 	if (cntxt.texState.textureEnabled){
@@ -139,7 +142,10 @@ void nmglDrawArrays(NMGLenum mode, NMGLint first, NMGLsizei count) {
 		}
 	}
 #endif //TEXTURE_ENABLED
-		
+		//for (int i = 0; i < localSize; i++){
+		//	printf("X = %f Y = %f Z = %f W = %f\n", ((float*)vertexResult)[i], ((float*)vertexResult)[i+1], ((float*)vertexResult)[i+2], ((float*)vertexResult)[i+3]);
+		//}
+
 		//color
 		if (cntxt.colorArray.enabled) {
 			colorAM.pop(colorOrNormal);
@@ -182,9 +188,22 @@ void nmglDrawArrays(NMGLenum mode, NMGLint first, NMGLsizei count) {
 		//vertex in vertexResult
 		//color in colorOrNormal
 		//texcoords in texCoord
+	//for (int i = 0; i < localSize; i++){
+	//		printf("X = %f Y = %f Z = %f W = %f\n", ((float*)vertexResult)[i], ((float*)vertexResult)[i+1], ((float*)vertexResult)[i+2], ((float*)vertexResult)[i+3]);
+	//	}
+		//printf("1 vertexResult addr = %x\n", &vertexResult);
+		// printf("matrix addr = %x\n", cntxt.projectionMatrixStack.top());
 		mul_mat4nm32f_v4nm32f(cntxt.projectionMatrixStack.top(), vertexResult, (v4nm32f*)vertexResult, localSize);
+		//printf("2 vertexResult addr = %x\n", &vertexResult);
+	//for (int i = 0; i < localSize; i++){
+	//		printf("* X = %f Y = %f Z = %f W = %f\n", ((float*)vertexResult)[i], ((float*)vertexResult)[i+1], ((float*)vertexResult)[i+2], ((float*)vertexResult)[i+3]);
+	//	}
+
 		//------------------------------srcX-----srcY-----srcZ-----srcW--------------
 		split_v4nm32f(vertexResult, 1, cntxt.buffer0, cntxt.buffer1, cntxt.buffer2, cntxt.buffer3, localSize);
+		//for (int i = 0; i < localSize; i++){
+		//	printf("X = %f Y = %f\n", cntxt.buffer0[i], cntxt.buffer1[i]);
+		//}
 
 #ifdef TEXTURE_ENABLED
     	//----------------------------------- Save vertexZEye for texturing-------------------------------------
@@ -200,7 +219,10 @@ void nmglDrawArrays(NMGLenum mode, NMGLint first, NMGLsizei count) {
         	split_v4nm32f(vertexResult, 1, cntxt.buffer0, cntxt.buffer1, cntxt.buffer2, cntxt.buffer3, localSize);
         }
 #endif //TEXTURE_ENABLED
-        
+    	//for (int i = 0; i < localSize; i++){
+		//	printf("* X = %f Y = %f\n", cntxt.buffer0[i], cntxt.buffer1[i]);
+		//}
+    
 		//------------clipping-------------------
 
 		//------------perspective-division-----------------		static unsigned time = 0;
@@ -216,6 +238,9 @@ void nmglDrawArrays(NMGLenum mode, NMGLint first, NMGLsizei count) {
 		nmppsConvert_32s32f((int*)cntxt.buffer0, vertexX, localSize);
 		nmppsConvert_32f32s_rounding(vertexY, (int*)cntxt.buffer0, 0, localSize);
 		nmppsConvert_32s32f((int*)cntxt.buffer0, vertexY, localSize);
+		//for (int i = 0; i < localSize; i++){
+		//	printf("X = %f Y = %f\n", vertexX[i], vertexY[i]);
+		//}
 
 #ifdef TEXTURE_ENABLED
 		if (cntxt.texState.textureEnabled){

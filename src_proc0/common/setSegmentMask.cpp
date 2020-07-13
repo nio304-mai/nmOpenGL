@@ -13,6 +13,10 @@ void setSegmentMask(NMGL_Context_NM0 &cntxt, Triangles &triangles, BitMask* mask
 	findMinMax3(triangles.y0, triangles.y1, triangles.y2, cntxt.buffer2, cntxt.buffer3, size);
 	nmppsMerge_32f(cntxt.buffer0, cntxt.buffer2, minXY, size);
 	nmppsMerge_32f(cntxt.buffer1, cntxt.buffer3, maxXY, size);
+	for (int i = 0; i < size; i ++) {
+		// printf ("minXY %f %f\n", ((float*)minXY)[i], ((float*)minXY)[i+1]);
+		// printf ("maxXY %f %f\n", ((float*)maxXY)[i], ((float*)maxXY)[i+1]);
+	}
 	for (int segY = 0, iSeg = 0; segY < cntxt.windowInfo.nRows; segY++) {
 		for (int segX = 0; segX < cntxt.windowInfo.nColumns; segX++, iSeg++) {
 			v2nm32f* lowerLimit = (v2nm32f*)&cntxt.tmp;

@@ -8,7 +8,7 @@
 
 #include "nmgltex_nm1.h"
 #include "nmgltex_common.h"
-#include "textureTriangle.h"
+//#include "textureTriangle.h"
 
 extern "C" TexImage2D teximage_256_256;
 extern "C" TexImage2D teximage_mytexture;
@@ -20,24 +20,36 @@ extern "C" TexImage2D teximage_8_8;
 extern "C" TexImage2D teximage_4_4;
 extern "C" TexImage2D teximage_2_2;
 extern "C" TexImage2D teximage_1_1;
+
+SECTION(".data_imu0") TrianglesInfo triangles;
+
+union intfloat_t
+{
+    float fl;
+    unsigned int uinteg;
+};
+
 #endif //TEXTURE_ENABLED
 
-
 SECTION(".data_imu0") Rectangle windows[NMGL_SIZE];
+SECTION(".data_imu0") intfloat_t texdata;
+
 
 SECTION(".text_demo3d") void drawTriangles(NMGL_Context_NM1* context) {
 	PolygonsConnector connector(context->polygonsData);
 	Polygons* poly = connector.ptrTail();
+	// printf("%s %d \n",__func__, __LINE__);
 	getAddrPtrnsT(context, poly);
 	nm32s* mulZ = context->buffer0;
 	nm32s* mulC = context->buffer0;
+	nm32s* texC = context->buffer0 + WIDTH_PTRN*HEIGHT_PTRN*SMALL_SIZE;
 	nm32s* zMaskBuffer = context->buffer1;
 #ifdef TEXTURE_ENABLED
     nm32s* texTri = context->buffer0;
 #endif //TEXTURE_ENABLED
-
+	// printf("%s %d \n",__func__, __LINE__);
 	msdWaitDma(0);
-
+	// printf("%s %d \n",__func__, __LINE__);
 	merge_v4nm32s(context->offsetTrX,
 		context->offsetTrY,
 		context->widths, 
@@ -149,7 +161,7 @@ SECTION(".text_demo3d") void drawTriangles(NMGL_Context_NM1* context) {
 
 #ifdef TEXTURE_ENABLED //for test
         //ћассив данных о треугольниках (координаты вершин, текстурные координаты и т.д.)
-        Triangles triangles;
+        // TrianglesInfo triangles;
         
         context->texState.activeTexUnitIndex = 0;
         unsigned int activeTexUnitIndex = context->texState.activeTexUnitIndex;
@@ -158,7 +170,9 @@ SECTION(".text_demo3d") void drawTriangles(NMGL_Context_NM1* context) {
         TexObject* boundTexObject = context->texState.texUnits[activeTexUnitIndex].boundTexObject;
         
         // boundTexObject->texImages2D[0] = teximage_256_256;
-        boundTexObject->texImages2D[0] = teximage_mytexture;
+        // boundTexObject->texImages2D[0] = teximage_mytexture;
+        // boundTexObject->texImages2D[0] = teximage_16_16;
+        boundTexObject->texImages2D[0] = teximage_32_32;
         boundTexObject->texImages2D[1] = teximage_128_128;
         boundTexObject->texImages2D[2] = teximage_64_64;
         boundTexObject->texImages2D[3] = teximage_32_32;
@@ -202,13 +216,84 @@ SECTION(".text_demo3d") void drawTriangles(NMGL_Context_NM1* context) {
         	triangles.t2 = context->texT2 + point;
         	
         	triangles.z = context->zEye + point;
-
+			
+			printf ("**********\n");
+			for (int trCnt = 0; trCnt < localSize; trCnt++){
+                printf ("triangle %x\n", trCnt);
+				// printf("trCnt = %x\n", trCnt);
+				// printf("x0 = %f\n", ((nm32f*)triangles.x0)[trCnt]);
+				// printf("y0 = %f\n", ((nm32f*)triangles.x0)[trCnt]);
+				// printf("x1 = %f\n", ((nm32f*)triangles.x1)[trCnt]);
+				// printf("y1 = %f\n", ((nm32f*)triangles.y1)[trCnt]);
+				// printf("x2 = %x\n", ((nm32f*)triangles.x2)[trCnt]);
+				// printf("y2 = %f\n", ((nm32f*)triangles.y2)[trCnt]);
+				// printf("s0 = %f\n", ((nm32f*)triangles.s0)[trCnt]);
+				texdata.fl = ((nm32f*)triangles.s0)[trCnt];
+				printf ("%x\n",texdata.uinteg);
+				texdata.fl = ((nm32f*)triangles.t0)[trCnt];
+				printf ("%x\n",texdata.uinteg);
+				texdata.fl = ((nm32f*)triangles.s1)[trCnt];
+				printf ("%x\n",texdata.uinteg);
+				texdata.fl = ((nm32f*)triangles.t1)[trCnt];
+				printf ("%x\n",texdata.uinteg);
+				texdata.fl = ((nm32f*)triangles.s2)[trCnt];
+				printf ("%x\n",texdata.uinteg);
+				texdata.fl = ((nm32f*)triangles.t2)[trCnt];
+				printf ("%x\n",texdata.uinteg);
+                
+				texdata.fl = ((nm32f*)triangles.x0)[trCnt];
+				printf ("%x\n",texdata.uinteg);
+				texdata.fl = ((nm32f*)triangles.y0)[trCnt];
+				printf ("%x\n",texdata.uinteg);
+				texdata.fl = ((nm32f*)triangles.x1)[trCnt];
+				printf ("%x\n",texdata.uinteg);
+				texdata.fl = ((nm32f*)triangles.y1)[trCnt];
+				printf ("%x\n",texdata.uinteg);
+				texdata.fl = ((nm32f*)triangles.x2)[trCnt];
+				printf ("%x\n",texdata.uinteg);
+				texdata.fl = ((nm32f*)triangles.y2)[trCnt];
+				printf ("%x\n",texdata.uinteg);
+				texdata.fl = ((nm32f*)triangles.z)[trCnt];
+				printf ("%x\n",texdata.uinteg);
+				printf ("%x\n",texdata.uinteg);
+				printf ("%x\n",texdata.uinteg);
+				printf ("%x\n",texdata.uinteg);
+				printf ("%x\n",texdata.uinteg);
+				printf ("%x\n",texdata.uinteg);
+				printf ("%x\n",texdata.uinteg);
+				printf ("%x\n",texdata.uinteg);
+				printf ("%x\n",texdata.uinteg);
+				printf ("%x\n",texdata.uinteg);
+				printf ("%x\n",texdata.uinteg);
+				printf ("%x\n",texdata.uinteg);
+				printf ("%x\n",texdata.uinteg);				
+				// printf("t0 = %f\n", ((nm32f*)triangles.t0)[trCnt]);
+				// printf("s1 = %f\n", ((nm32f*)triangles.s1)[trCnt]);
+				// printf("t1 = %f\n", ((nm32f*)triangles.t1)[trCnt]);
+				// printf("s2 = %x\n", ((nm32f*)triangles.s2)[trCnt]);
+				// printf("t2 = %x\n", ((nm32f*)triangles.t2)[trCnt]);
+				// printf("z = %x\n", ((nm32f*)triangles.t2)[trCnt]);
+			}
+			
+			
         	textureTriangle(context->polyImgTmp, &triangles, 
         	                context->imagePoints + point, 
         	                windows + point, 
         	                mulC, 
         	                mulC, 
         	                localSize);
+			
+			// for (int xi = 0; xi < 16; xi++)
+			// {
+				// a.x[0] = 0.0f;
+			// }
+			// foo(
+				// context->polyImgTmp,
+				// //&triangles,
+				// context->imagePoints + point, 
+				// &a,
+				// windows + point
+			// );
 		}
 #endif //TEXTURE_ENABLED
 
@@ -222,6 +307,8 @@ SECTION(".text_demo3d") void drawTriangles(NMGL_Context_NM1* context) {
 		countTrangles -= SMALL_SIZE;
 		point += SMALL_SIZE;
 	}
+	printf("%s %d \n",__func__, __LINE__);
 
 	return;
 }
+
