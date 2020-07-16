@@ -26,21 +26,23 @@ SECTION(".data_shmem1") nm32s valuesZ[NMGL_SIZE];
 SECTION(".data_shmem1") nm32s valuesC[NMGL_SIZE];
 
 #ifdef TEXTURE_ENABLED
-SECTION(".data_imu0") float x0[NMGL_SIZE];
-SECTION(".data_imu0") float y0[NMGL_SIZE];
-SECTION(".data_imu0") float x1[NMGL_SIZE];
-SECTION(".data_imu0") float y1[NMGL_SIZE];
-SECTION(".data_imu0") float x2[NMGL_SIZE];
-SECTION(".data_imu0") float y2[NMGL_SIZE];
+SECTION(".data_shmem1") float x0[NMGL_SIZE];
+SECTION(".data_shmem1") float y0[NMGL_SIZE];
+SECTION(".data_shmem1") float x1[NMGL_SIZE];
+SECTION(".data_shmem1") float y1[NMGL_SIZE];
+SECTION(".data_shmem1") float x2[NMGL_SIZE];
+SECTION(".data_shmem1") float y2[NMGL_SIZE];
 
-SECTION(".data_imu0") float texS0[NMGL_SIZE];
-SECTION(".data_imu0") float texT0[NMGL_SIZE];
-SECTION(".data_imu0") float texS1[NMGL_SIZE];
-SECTION(".data_imu0") float texT1[NMGL_SIZE];
-SECTION(".data_imu0") float texS2[NMGL_SIZE];
-SECTION(".data_imu0") float texT2[NMGL_SIZE];
+SECTION(".data_shmem1") float texS0[NMGL_SIZE];
+SECTION(".data_shmem1") float texT0[NMGL_SIZE];
+SECTION(".data_shmem1") float texS1[NMGL_SIZE];
+SECTION(".data_shmem1") float texT1[NMGL_SIZE];
+SECTION(".data_shmem1") float texS2[NMGL_SIZE];
+SECTION(".data_shmem1") float texT2[NMGL_SIZE];
 
-SECTION(".data_imu0") float zEye[NMGL_SIZE];
+SECTION(".data_shmem1") float zEye[NMGL_SIZE];
+extern  NMGL_Context_NM1_Texture nm1TexState;
+
 #endif //TEXTURE_ENABLED
 
 
@@ -147,7 +149,8 @@ SECTION(".text_nmglvs") int nmglvsNm1Init()
 	cntxt.imagePoints = imagePoints;
 
 #ifdef TEXTURE_ENABLED
-    cntxt.texState.textureEnabled = 1;
+	cntxt.texState = &nm1TexState;
+    cntxt.texState->textureEnabled = 1;
     cntxt.x0 = x0;
     cntxt.y0 = y0;
     cntxt.x1 = x1;

@@ -31,7 +31,7 @@ void rasterizeT(const Triangles* triangles, const BitMask* masks){
 	localTrian.z = (int*)cntxt.buffer3 + 4 * NMGL_SIZE;
 
 #ifdef TEXTURE_ENABLED
-	if (cntxt.texState.textureEnabled){
+	if (cntxt.texState->textureEnabled){
 		localTrian.s0 = cntxt.buffer0 + 10 * NMGL_SIZE;
 		localTrian.t0 = cntxt.buffer0 + 11 * NMGL_SIZE;
 		localTrian.s1 = cntxt.buffer1 + 10 * NMGL_SIZE;
@@ -46,36 +46,45 @@ void rasterizeT(const Triangles* triangles, const BitMask* masks){
 	for (int segY = 0, iSeg = 0; segY < cntxt.windowInfo.nRows; segY++) {
 		for (int segX = 0; segX < cntxt.windowInfo.nColumns; segX++, iSeg++) {
 			if (masks[iSeg].hasNotZeroBits != 0) {
+				//printf("segment has not zero bits. segX = %d segY = %d \n", segX, segY);
 
 				int resultSize = readMask(masks[iSeg].bits, indices, count);
 				if (resultSize) {
+					// printf("resultSize = %d segX = %d segY = %d \n", resultSize, segX, segY);
 					cntxt.synchro.writeInstr(1, NMC1_COPY_SEG_FROM_IMAGE,
 						cntxt.windowInfo.x0[segX],
 						cntxt.windowInfo.y0[segY],
 						cntxt.windowInfo.x1[segX] - cntxt.windowInfo.x0[segX],
 						cntxt.windowInfo.y1[segY] - cntxt.windowInfo.y0[segY],
 						iSeg);
-					if (cntxt.texState.textureEnabled){
+#ifdef TEXTURE_ENABLED
+					if (cntxt.texState->textureEnabled){
+						// copyArraysByIndices((void**)triangles, indices, (void**)&localTrian, 14, resultSize);
 						copyArraysByIndices((void**)triangles, indices, (void**)&localTrian, 14, resultSize);
 					} else {
 						copyArraysByIndices((void**)triangles, indices, (void**)&localTrian, 7, resultSize);
 					}
+#else //TEXTURE_ENABLED
+					copyArraysByIndices((void**)triangles, indices, (void**)&localTrian, 7, resultSize);
+#endif //TEXTURE_ENABLED
 					copyColorByIndices_BGRA_RGBA(triangles->colors, indices, (v4nm32s*)localTrian.colors, resultSize);
 
 					//waitPolygons(connector);
 					while (connector.isFull());
 					Polygons* poly = connector.ptrHead();
 					poly->count = 0;
+					// printf("%s %d \n",__func__, __LINE__);
 					updatePolygonsT(poly, &localTrian, resultSize, segX, segY);
 					connector.incHead();
 					cntxt.synchro.writeInstr(1, NMC1_DRAW_TRIANGLES);
-
+					// printf("%s %d \n",__func__, __LINE__);
 					cntxt.synchro.writeInstr(1,
 						NMC1_COPY_SEG_TO_IMAGE,
 						cntxt.windowInfo.x0[segX],
 						cntxt.windowInfo.y0[segY],
 						cntxt.windowInfo.x1[segX] - cntxt.windowInfo.x0[segX],
 						cntxt.windowInfo.y1[segY] - cntxt.windowInfo.y0[segY]);
+					// printf("%s %d \n",__func__, __LINE__);
 				}				
 			}
 		}

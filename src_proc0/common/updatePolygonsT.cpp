@@ -18,7 +18,7 @@
 SECTION(".text_demo3d")
 void updatePolygonsT(Polygons* poly, Triangles* triangles, int count, int segX, int segY){
 #ifdef TEXTURE_ENABLED
-	if (cntxt.texState.textureEnabled){
+	if (cntxt.texState->textureEnabled){
 		nmblas_scopy(count, (float*)triangles->x0, 1, (float*)poly->x0 + poly->count, 1);
 		nmblas_scopy(count, (float*)triangles->y0, 1, (float*)poly->y0 + poly->count, 1);
 		nmblas_scopy(count, (float*)triangles->x1, 1, (float*)poly->x1 + poly->count, 1);

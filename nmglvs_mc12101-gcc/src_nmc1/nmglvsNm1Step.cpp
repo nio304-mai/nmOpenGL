@@ -85,16 +85,18 @@ SECTION(".text_nmglvs") int nmglvsNm1Step()
 
 			imageSize = cntxt.depthBuffer.getSize();
 			nmppsSet_32s((nm32s*)depthClearBuff, cntxt.depthBuffer.clearValue, bufferSize);
-
+			
 			for (int y = 0; y < HEIGHT_IMAGE; y += HEIGHT_SEG) {
 				for (int x = 0; x < WIDTH_IMAGE; x += WIDTH_SEG) {
 					taskColor.dst = (nm32s*)cntxt.colorBuffer.data + y * WIDTH_IMAGE + x;
+					
 					msdAdd(taskColor);
 
 					taskDepth.dst = (nm32s*)cntxt.depthBuffer.data + y * WIDTH_IMAGE + x;
 					msdAdd(taskDepth);
 				}
 			}
+			
 			break;
 		default:
 			break;
@@ -103,6 +105,8 @@ SECTION(".text_nmglvs") int nmglvsNm1Step()
 	}
 	case NMC1_COPY_SEG_FROM_IMAGE:
 	{		
+		// printf("%s %d \n",__func__, __LINE__);
+		puts("< ");
 		int x0 = currentCommand.params[0];
 		int y0 = currentCommand.params[1];
 		int width = currentCommand.params[2];
@@ -110,13 +114,12 @@ SECTION(".text_nmglvs") int nmglvsNm1Step()
 		int numOfSeg = currentCommand.params[4];
         
 #ifdef TEXTURE_ENABLED
-	 	if (cntxt.texState.textureEnabled){
-			cntxt.texState.segX0 = x0;
-			cntxt.texState.segY0 = y0;
-			cntxt.texState.segWidth = width;
+	 	if (cntxt.texState->textureEnabled){
+			cntxt.texState->segX0 = x0;
+			cntxt.texState->segY0 = y0;
+			cntxt.texState->segWidth = width;
 		}
 #endif //TEXTURE_ENABLED
-        
 		if (cntxt.depthBuffer.enabled == NMGL_TRUE) {
 			nm32s* src = nmppsAddr_32s((int*)cntxt.depthBuffer.data, y0 * cntxt.depthBuffer.getWidth() + x0);
 			nm32s* dst = (nm32s*)cntxt.smallDepthBuff.data;
@@ -133,6 +136,8 @@ SECTION(".text_nmglvs") int nmglvsNm1Step()
 	}
 
 	case NMC1_COPY_SEG_TO_IMAGE: {
+		// printf("%s %d \n",__func__, __LINE__);
+		// printf ("* ");
 		int x0 = currentCommand.params[0];
 		int y0 = currentCommand.params[1];
 		int width = currentCommand.params[2];
@@ -147,10 +152,13 @@ SECTION(".text_nmglvs") int nmglvsNm1Step()
 		nm32s* dst = nmppsAddr_32s((int*)cntxt.colorBuffer.data, y0 * cntxt.colorBuffer.getWidth() + x0);
 		msdAdd2D(src, dst, width * height, width,
 			cntxt.smallColorBuff.getWidth(), cntxt.colorBuffer.getWidth(), 1);
+		// printf("%s %d \n",__func__, __LINE__);
+		// printf("* ");
 		break;
 	}
 
 	case NMC1_DRAW_TRIANGLES: {
+		printf("* ");
 		drawTriangles(&cntxt);
 		break;
 	}
@@ -185,7 +193,7 @@ SECTION(".text_nmglvs") int nmglvsNm1Step()
 		break;
 	}
 	case NMC1_SWAP_BUFFER: {
-
+		printf("/ ");
 		msdWaitDma();
 		
 		cntxt.t1 = clock();
@@ -195,6 +203,7 @@ SECTION(".text_nmglvs") int nmglvsNm1Step()
 		cntxt.colorBuffer.data = cntxt.imagesData->ptrHead();
 		while (cntxt.imagesData->isFull());
 		cntxt.t0 = clock();
+		// printf("%s %d \n",__func__, __LINE__);
 
 		break;
 	}
@@ -263,7 +272,8 @@ SECTION(".text_nmglvs") int nmglvsNm1Step()
 	}
 	
 	case NMC1_SET_ACTIVE_TEXTURE: {
-		cntxt.texState.activeTexUnitIndex = currentCommand.params[0];
+		puts("- ");
+		cntxt.texState->activeTexUnitIndex = currentCommand.params[0];
 		break;
 	}
 

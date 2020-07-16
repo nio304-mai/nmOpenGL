@@ -49,7 +49,7 @@ void nmglDrawArrays(NMGLenum mode, NMGLint first, NMGLsizei count) {
 	float* srcDDR_vertex = (float*)cntxt.vertexArray.pointer + cntxt.vertexArray.size * first;
 	float* srcDDR_normal = (float*)cntxt.normalArray.pointer + cntxt.normalArray.size * first;
 #ifdef TEXTURE_ENABLED
-	float* srcDDR_texcoords = (float*)cntxt.texState.texcoordArray[0].pointer + cntxt.texState.texcoordArray[0].size * first;
+	float* srcDDR_texcoords = (float*)cntxt.texState->texcoordArray[0].pointer + cntxt.texState->texcoordArray[0].size * first;
 #endif //TEXTURE_ENABLED
 	v4nm32f* srcDDR_color = (v4nm32f*)cntxt.colorArray.pointer + first;
 
@@ -73,8 +73,8 @@ void nmglDrawArrays(NMGLenum mode, NMGLint first, NMGLsizei count) {
 	vertexAM.set(srcDDR_vertex, cntxt.vertexArray.size * count, cntxt.vertexArray.size * maxInnerCount, copyVec<float>);
 	normalAM.set(srcDDR_normal, cntxt.normalArray.size * count, cntxt.normalArray.size * maxInnerCount, copyVec<float>);
 #ifdef TEXTURE_ENABLED
-	if (cntxt.texState.textureEnabled){
-		texcoordAM.set(srcDDR_texcoords, cntxt.texState.texcoordArray[0].size * count, cntxt.texState.texcoordArray[0].size * maxInnerCount, copyVec<float>);
+	if (cntxt.texState->textureEnabled){
+		texcoordAM.set(srcDDR_texcoords, cntxt.texState->texcoordArray[0].size * count, cntxt.texState->texcoordArray[0].size * maxInnerCount, copyVec<float>);
 	}
 #endif //TEXTURE_ENABLED
 	colorAM.set(srcDDR_color, count, maxInnerCount, copyVec<v4nm32f>);
@@ -112,13 +112,16 @@ void nmglDrawArrays(NMGLenum mode, NMGLint first, NMGLsizei count) {
 			break;
 		}
 		mul_mat4nm32f_v4nm32f(cntxt.modelviewMatrixStack.top(), (v4nm32f*)cntxt.buffer1, vertexResult, localSize);
+		//for (int i = 0; i < localSize; i++){
+		//	printf("X = %f Y = %f Z = %f W = %f\n", ((float*)vertexResult)[i], ((float*)vertexResult)[i+1], ((float*)vertexResult)[i+2], ((float*)vertexResult)[i+3]);
+		//}
 
 #ifdef TEXTURE_ENABLED
-	if (cntxt.texState.textureEnabled){
+	if (cntxt.texState->textureEnabled){
 		//texture coordinates
-		if (cntxt.texState.texcoordArray[0].enabled) {
+		if (cntxt.texState->texcoordArray[0].enabled) {
 			texcoordAM.pop(cntxt.buffer0);
-			switch (cntxt.texState.texcoordArray[0].size) //Must be equal to 2
+			switch (cntxt.texState->texcoordArray[0].size) //Must be equal to 2
 			{
 				case 2:
 					nmblas_dcopy(localSize, (double*)cntxt.buffer0, 1, (double*)cntxt.buffer1, 2);
@@ -139,7 +142,10 @@ void nmglDrawArrays(NMGLenum mode, NMGLint first, NMGLsizei count) {
 		}
 	}
 #endif //TEXTURE_ENABLED
-		
+		//for (int i = 0; i < localSize; i++){
+		//	printf("X = %f Y = %f Z = %f W = %f\n", ((float*)vertexResult)[i], ((float*)vertexResult)[i+1], ((float*)vertexResult)[i+2], ((float*)vertexResult)[i+3]);
+		//}
+
 		//color
 		if (cntxt.colorArray.enabled) {
 			colorAM.pop(colorOrNormal);
@@ -182,13 +188,26 @@ void nmglDrawArrays(NMGLenum mode, NMGLint first, NMGLsizei count) {
 		//vertex in vertexResult
 		//color in colorOrNormal
 		//texcoords in texCoord
+	//for (int i = 0; i < localSize; i++){
+	//		printf("X = %f Y = %f Z = %f W = %f\n", ((float*)vertexResult)[i], ((float*)vertexResult)[i+1], ((float*)vertexResult)[i+2], ((float*)vertexResult)[i+3]);
+	//	}
+		//printf("1 vertexResult addr = %x\n", &vertexResult);
+		// printf("matrix addr = %x\n", cntxt.projectionMatrixStack.top());
 		mul_mat4nm32f_v4nm32f(cntxt.projectionMatrixStack.top(), vertexResult, (v4nm32f*)vertexResult, localSize);
+		//printf("2 vertexResult addr = %x\n", &vertexResult);
+	//for (int i = 0; i < localSize; i++){
+	//		printf("* X = %f Y = %f Z = %f W = %f\n", ((float*)vertexResult)[i], ((float*)vertexResult)[i+1], ((float*)vertexResult)[i+2], ((float*)vertexResult)[i+3]);
+	//	}
+
 		//------------------------------srcX-----srcY-----srcZ-----srcW--------------
 		split_v4nm32f(vertexResult, 1, cntxt.buffer0, cntxt.buffer1, cntxt.buffer2, cntxt.buffer3, localSize);
+		//for (int i = 0; i < localSize; i++){
+		//	printf("X = %f Y = %f\n", cntxt.buffer0[i], cntxt.buffer1[i]);
+		//}
 
 #ifdef TEXTURE_ENABLED
     	//----------------------------------- Save vertexZEye for texturing-------------------------------------
-		if (cntxt.texState.textureEnabled){
+		if (cntxt.texState->textureEnabled){
         	int countPrim = localSize / 3;
        		float* temp0 = cntxt.buffer0 + 3 * NMGL_SIZE;
         	float* temp1 = cntxt.buffer1 + 6 * NMGL_SIZE;
@@ -200,7 +219,10 @@ void nmglDrawArrays(NMGLenum mode, NMGLint first, NMGLsizei count) {
         	split_v4nm32f(vertexResult, 1, cntxt.buffer0, cntxt.buffer1, cntxt.buffer2, cntxt.buffer3, localSize);
         }
 #endif //TEXTURE_ENABLED
-        
+    	//for (int i = 0; i < localSize; i++){
+		//	printf("* X = %f Y = %f\n", cntxt.buffer0[i], cntxt.buffer1[i]);
+		//}
+    
 		//------------clipping-------------------
 
 		//------------perspective-division-----------------		static unsigned time = 0;
@@ -216,9 +238,12 @@ void nmglDrawArrays(NMGLenum mode, NMGLint first, NMGLsizei count) {
 		nmppsConvert_32s32f((int*)cntxt.buffer0, vertexX, localSize);
 		nmppsConvert_32f32s_rounding(vertexY, (int*)cntxt.buffer0, 0, localSize);
 		nmppsConvert_32s32f((int*)cntxt.buffer0, vertexY, localSize);
+		//for (int i = 0; i < localSize; i++){
+		//	printf("X = %f Y = %f\n", vertexX[i], vertexY[i]);
+		//}
 
 #ifdef TEXTURE_ENABLED
-		if (cntxt.texState.textureEnabled){
+		if (cntxt.texState->textureEnabled){
 			//------------------------------texCoordX-----texCoordY-----texCoordZ-----texCoordW--------------
 			split_v4nm32f(texCoord, 1, cntxt.buffer0, cntxt.buffer1, cntxt.buffer2, cntxt.buffer3, localSize);
 			nmblas_scopy(localSize, cntxt.buffer0, 1, vertexS, 1);
