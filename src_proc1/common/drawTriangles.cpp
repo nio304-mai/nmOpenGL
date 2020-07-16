@@ -101,40 +101,6 @@ SECTION(".text_demo3d") void drawTriangles(NMGL_Context_NM1* context) {
 			(nm32u**)context->ppPtrnsCombined_2s, 
 			context->nSizePtrn32 + point_x3, localSize);
 
-		// printf("0\n\n");
-		// printf("\n");
-		// for (int i = 0; i < 32; i++)
-		// {
-			// printf("0x%016llx, \n", ((long long int*)context->ppPtrnsCombined_2s[0])[i]);
-		// }
-		// printf("\n");
-		// for (int i = 0; i < 32; i++)
-		// {
-			// printf("0x%016llx, \n", ((long long int*)context->ppPtrns1_2s[0])[i]);
-		// }
-		// printf("\n");
-		// for (int i = 0; i < 32; i++)
-		// {
-			// printf("0x%016llx, \n", ((long long int*)context->ppPtrns2_2s[0])[i]);
-		// }
-
-		// printf("1\n\n");
-		// printf("\n");
-		// for (int i = 0; i < 32; i++)
-		// {
-			// printf("0x%016llx, \n", ((long long int*)context->ppPtrnsCombined_2s[1])[i]);
-		// }
-		// printf("\n");
-		// for (int i = 0; i < 32; i++)
-		// {
-			// printf("0x%016llx, \n", ((long long int*)context->ppPtrns1_2s[1])[i]);
-		// }
-		// printf("\n");
-		// for (int i = 0; i < 32; i++)
-		// {
-			// printf("0x%016llx, \n", ((long long int*)context->ppPtrns2_2s[1])[i]);
-		// }
-		
 		//проверка активирования теста глубины
 		if (context->depthBuffer.enabled == NMGL_FALSE) {
 			mMulCVxN_2s32s(
@@ -152,7 +118,6 @@ SECTION(".text_demo3d") void drawTriangles(NMGL_Context_NM1* context) {
 				valuesZ,
 				mulZ,
 				localSize);
-
 
 			//mulZ теперь хранит z-треугольники
 
@@ -175,9 +140,9 @@ SECTION(".text_demo3d") void drawTriangles(NMGL_Context_NM1* context) {
 		//mulBuffer теперь хранит цвет
 
 #ifdef TEXTURE_ENABLED //for test
-        //Массив данных о треугольниках (координаты вершин, текстурные координаты и т.д.)
-        // TrianglesInfo triangles;
-        
+		//предварительная настройка контекста для выполнения текстурирования
+		//ручная загрузка текстур и настройка параметров
+		       
         context->texState->activeTexUnitIndex = 0;
         unsigned int activeTexUnitIndex = context->texState->activeTexUnitIndex;
     
@@ -217,6 +182,8 @@ SECTION(".text_demo3d") void drawTriangles(NMGL_Context_NM1* context) {
 #ifdef TEXTURE_ENABLED
 		if (context->texState->textureEnabled){
 
+			//значения для структуры triangles помещаются в контекст из статических массивов
+			//вне функции getAddrPtrnsT
 			context->x0 = cntxt_x0;
 			context->y0 = cntxt_y0;
 			context->x1 = cntxt_x1;
@@ -231,6 +198,7 @@ SECTION(".text_demo3d") void drawTriangles(NMGL_Context_NM1* context) {
 			context->texT2 = cntxt_t2;
 			context->zEye = cntxt_zEye;
 
+			//заполняем стуктуру triangles
         	triangles.x0 = context->x0 + point;
         	triangles.y0 = context->y0 + point;
         	triangles.x1 = context->x1 + point;
@@ -312,18 +280,6 @@ SECTION(".text_demo3d") void drawTriangles(NMGL_Context_NM1* context) {
         	                mulC, 
         	                mulC, 
         	                localSize);
-			
-			// for (int xi = 0; xi < 16; xi++)
-			// {
-				// a.x[0] = 0.0f;
-			// }
-			// foo(
-				// context->polyImgTmp,
-				// //&triangles,
-				// context->imagePoints + point, 
-				// &a,
-				// windows + point
-			// );
 		}
 #endif //TEXTURE_ENABLED
 
