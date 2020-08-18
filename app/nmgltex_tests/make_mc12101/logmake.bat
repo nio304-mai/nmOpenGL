@@ -1,0 +1,1 @@
+make run 2>&1 1>make_log

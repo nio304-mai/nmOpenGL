@@ -1,0 +1,42 @@
+"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\vsvars32" && msbuild mc12101-x86.vcxproj /p:Configuration=Debug
+Microsoft (R) Build Engine версии 14.0.25420.1
+(C) Корпорация Майкрософт (Microsoft Corporation). Все права защищены.
+
+Сборка начата 06.08.2020 14:54:29.
+Проект "D:\_git\Rep\Fork_NMOpenGL\nmOpenGL\app\_my_tests\make_mc12101\mc12101-x86.vcxproj" в узле 1 (целевые объекты по умолчанию).
+Проект "D:\_git\Rep\Fork_NMOpenGL\nmOpenGL\app\_my_tests\make_mc12101\mc12101-x86.vcxproj" (1) выполняет сборку "D:\_git\Rep\Fork_NMOpenGL\nmOpenGL\app\_my_tests\make_mc12101\mc12101-nmc4-0.vcxproj" (2) в узле 1 (целевые объекты по умолчанию).
+Build:
+  make DEBUG=y -f Makefile0
+  make[1]: Entering directory `D:/_git/Rep/Fork_NMOpenGL/nmOpenGL/app/_my_tests/make_mc12101'
+  make[1]: Nothing to be done for `default'.
+  make[1]: Leaving directory `D:/_git/Rep/Fork_NMOpenGL/nmOpenGL/app/_my_tests/make_mc12101'
+Сборка проекта "D:\_git\Rep\Fork_NMOpenGL\nmOpenGL\app\_my_tests\make_mc12101\mc12101-nmc4-0.vcxproj" завершена (целевые объекты по умолчанию).
+Проект "D:\_git\Rep\Fork_NMOpenGL\nmOpenGL\app\_my_tests\make_mc12101\mc12101-x86.vcxproj" (1) выполняет сборку "D:\_git\Rep\Fork_NMOpenGL\nmOpenGL\app\_my_tests\make_mc12101\mc12101-nmc4-1.vcxproj" (3) в узле 1 (целевые объекты по умолчанию).
+Build:
+  make DEBUG=y -f Makefile1
+  make[1]: Entering directory `D:/_git/Rep/Fork_NMOpenGL/nmOpenGL/app/_my_tests/make_mc12101'
+  make[1]: Nothing to be done for `default'.
+  make[1]: Leaving directory `D:/_git/Rep/Fork_NMOpenGL/nmOpenGL/app/_my_tests/make_mc12101'
+Сборка проекта "D:\_git\Rep\Fork_NMOpenGL\nmOpenGL\app\_my_tests\make_mc12101\mc12101-nmc4-1.vcxproj" завершена (целевые объекты по умолчанию).
+InitializeBuildStatus:
+  Создание "obj\Debug\mc12101-x86\mc12101-x86.tlog\unsuccessfulbuild", так как было задано "AlwaysCreate".
+ClCompile:
+  Для всех выходных данных обновления не требуется.
+Link:
+  Для всех выходных данных обновления не требуется.
+  mc12101-x86.vcxproj -> D:\_git\Rep\Fork_NMOpenGL\nmOpenGL\app\_my_tests\make_mc12101\bin\Debug\mc12101-x86.exe
+  mc12101-x86.vcxproj -> bin\Debug\mc12101-x86.pdb (Full PDB)
+FinalizeBuildStatus:
+  Файл "obj\Debug\mc12101-x86\mc12101-x86.tlog\unsuccessfulbuild" удаляется.
+  Обращение к "obj\Debug\mc12101-x86\mc12101-x86.tlog\mc12101-x86.lastbuildstate".
+Сборка проекта "D:\_git\Rep\Fork_NMOpenGL\nmOpenGL\app\_my_tests\make_mc12101\mc12101-x86.vcxproj" завершена (целевые объекты по умолчанию).
+
+Сборка успешно завершена.
+    Предупреждений: 0
+    Ошибок: 0
+
+Затраченное время: 00:00:00.58
+bin\debug\mc12101-x86
+MC12101 board is busy
+ERROR: Can't open board 0 
+Connection to mc12101 error!

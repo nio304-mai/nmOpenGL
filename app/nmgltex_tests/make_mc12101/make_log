@@ -1,0 +1,324 @@
+"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\vsvars32" && msbuild mc12101-x86.vcxproj /p:Configuration=Debug
+Microsoft (R) Build Engine версии 14.0.25420.1
+(C) Корпорация Майкрософт (Microsoft Corporation). Все права защищены.
+
+Сборка начата 12.08.2020 23:26:10.
+Проект "D:\_git\Rep\Fork_NMOpenGL\nmOpenGL\app\_my_tests\make_mc12101\mc12101-x86.vcxproj" в узле 1 (целевые объекты по умолчанию).
+Проект "D:\_git\Rep\Fork_NMOpenGL\nmOpenGL\app\_my_tests\make_mc12101\mc12101-x86.vcxproj" (1) выполняет сборку "D:\_git\Rep\Fork_NMOpenGL\nmOpenGL\app\_my_tests\make_mc12101\mc12101-nmc4-0.vcxproj" (2) в узле 1 (целевые объекты по умолчанию).
+Build:
+  make DEBUG=y -f Makefile0
+  make[1]: Entering directory `D:/_git/Rep/Fork_NMOpenGL/nmOpenGL/app/_my_tests/make_mc12101'
+  make[1]: Nothing to be done for `default'.
+  make[1]: Leaving directory `D:/_git/Rep/Fork_NMOpenGL/nmOpenGL/app/_my_tests/make_mc12101'
+Сборка проекта "D:\_git\Rep\Fork_NMOpenGL\nmOpenGL\app\_my_tests\make_mc12101\mc12101-nmc4-0.vcxproj" завершена (целевые объекты по умолчанию).
+Проект "D:\_git\Rep\Fork_NMOpenGL\nmOpenGL\app\_my_tests\make_mc12101\mc12101-x86.vcxproj" (1) выполняет сборку "D:\_git\Rep\Fork_NMOpenGL\nmOpenGL\app\_my_tests\make_mc12101\mc12101-nmc4-1.vcxproj" (3) в узле 1 (целевые объекты по умолчанию).
+Build:
+  make DEBUG=y -f Makefile1
+  make[1]: Entering directory `D:/_git/Rep/Fork_NMOpenGL/nmOpenGL/app/_my_tests/make_mc12101'
+  make[1]: Nothing to be done for `default'.
+  make[1]: Leaving directory `D:/_git/Rep/Fork_NMOpenGL/nmOpenGL/app/_my_tests/make_mc12101'
+Сборка проекта "D:\_git\Rep\Fork_NMOpenGL\nmOpenGL\app\_my_tests\make_mc12101\mc12101-nmc4-1.vcxproj" завершена (целевые объекты по умолчанию).
+InitializeBuildStatus:
+  Создание "obj\Debug\mc12101-x86\mc12101-x86.tlog\unsuccessfulbuild", так как было задано "AlwaysCreate".
+ClCompile:
+  Для всех выходных данных обновления не требуется.
+Link:
+  Для всех выходных данных обновления не требуется.
+  mc12101-x86.vcxproj -> D:\_git\Rep\Fork_NMOpenGL\nmOpenGL\app\_my_tests\make_mc12101\bin\Debug\mc12101-x86.exe
+  mc12101-x86.vcxproj -> bin\Debug\mc12101-x86.pdb (Full PDB)
+FinalizeBuildStatus:
+  Файл "obj\Debug\mc12101-x86\mc12101-x86.tlog\unsuccessfulbuild" удаляется.
+  Обращение к "obj\Debug\mc12101-x86\mc12101-x86.tlog\mc12101-x86.lastbuildstate".
+Сборка проекта "D:\_git\Rep\Fork_NMOpenGL\nmOpenGL\app\_my_tests\make_mc12101\mc12101-x86.vcxproj" завершена (целевые объекты по умолчанию).
+
+Сборка успешно завершена.
+    Предупреждений: 0
+    Ошибок: 0
+
+Затраченное время: 00:00:01.36
+bin\debug\mc12101-x86
+Initial nm0 context fields:
+firstFreeTexByte=0
+Tex object name=1
+Mipmap level 0
+internalformat=0x1908
+level=0
+width=0
+height=0
+pixels=NULL
+Mipmap level 1
+internalformat=0x1908
+level=1
+width=0
+height=0
+pixels=NULL
+Mipmap level 2
+internalformat=0x1908
+level=2
+width=0
+height=0
+pixels=NULL
+Mipmap level 3
+internalformat=0x1908
+level=3
+width=0
+height=0
+pixels=NULL
+Mipmap level 4
+internalformat=0x1908
+level=4
+width=0
+height=0
+pixels=NULL
+Mipmap level 5
+internalformat=0x1908
+level=5
+width=0
+height=0
+pixels=NULL
+Mipmap level 6
+internalformat=0x1908
+level=6
+width=0
+height=0
+pixels=NULL
+Mipmap level 7
+internalformat=0x1908
+level=7
+width=0
+height=0
+pixels=NULL
+Mipmap level 8
+internalformat=0x1908
+level=8
+width=0
+height=0
+pixels=NULL
+Mipmap level 9
+internalformat=0x1908
+level=9
+width=0
+height=0
+pixels=NULL
+Mipmap level 10
+internalformat=0x1908
+level=10
+width=0
+height=0
+pixels=NULL
+Tex object name=2
+Mipmap level 0
+internalformat=0x1908
+level=0
+width=0
+height=0
+pixels=NULL
+Mipmap level 1
+internalformat=0x1908
+level=1
+width=0
+height=0
+pixels=NULL
+Mipmap level 2
+internalformat=0x1908
+level=2
+width=0
+height=0
+pixels=NULL
+Mipmap level 3
+internalformat=0x1908
+level=3
+width=0
+height=0
+pixels=NULL
+Mipmap level 4
+internalformat=0x1908
+level=4
+width=0
+height=0
+pixels=NULL
+Mipmap level 5
+internalformat=0x1908
+level=5
+width=0
+height=0
+pixels=NULL
+Mipmap level 6
+internalformat=0x1908
+level=6
+width=0
+height=0
+pixels=NULL
+Mipmap level 7
+internalformat=0x1908
+level=7
+width=0
+height=0
+pixels=NULL
+Mipmap level 8
+internalformat=0x1908
+level=8
+width=0
+height=0
+pixels=NULL
+Mipmap level 9
+internalformat=0x1908
+level=9
+width=0
+height=0
+pixels=NULL
+Mipmap level 10
+internalformat=0x1908
+level=10
+width=0
+height=0
+pixels=NULL
+Tex object name=3
+Mipmap level 0
+internalformat=0x1908
+level=0
+width=0
+height=0
+pixels=NULL
+Mipmap level 1
+internalformat=0x1908
+level=1
+width=0
+height=0
+pixels=NULL
+Mipmap level 2
+internalformat=0x1908
+level=2
+width=0
+height=0
+pixels=NULL
+Mipmap level 3
+internalformat=0x1908
+level=3
+width=0
+height=0
+pixels=NULL
+Mipmap level 4
+internalformat=0x1908
+level=4
+width=0
+height=0
+pixels=NULL
+Mipmap level 5
+internalformat=0x1908
+level=5
+width=0
+height=0
+pixels=NULL
+Mipmap level 6
+internalformat=0x1908
+level=6
+width=0
+height=0
+pixels=NULL
+Mipmap level 7
+internalformat=0x1908
+level=7
+width=0
+height=0
+pixels=NULL
+Mipmap level 8
+internalformat=0x1908
+level=8
+width=0
+height=0
+pixels=NULL
+Mipmap level 9
+internalformat=0x1908
+level=9
+width=0
+height=0
+pixels=NULL
+Mipmap level 10
+internalformat=0x1908
+level=10
+width=0
+height=0
+pixels=NULL
+Tex object name=4
+Mipmap level 0
+internalformat=0x1908
+level=0
+width=0
+height=0
+pixels=NULL
+Mipmap level 1
+internalformat=0x1908
+level=1
+width=0
+height=0
+pixels=NULL
+Mipmap level 2
+internalformat=0x1908
+level=2
+width=0
+height=0
+pixels=NULL
+Mipmap level 3
+internalformat=0x1908
+level=3
+width=0
+height=0
+pixels=NULL
+Mipmap level 4
+internalformat=0x1908
+level=4
+width=0
+height=0
+pixels=NULL
+Mipmap level 5
+internalformat=0x1908
+level=5
+width=0
+height=0
+pixels=NULL
+Mipmap level 6
+internalformat=0x1908
+level=6
+width=0
+height=0
+pixels=NULL
+Mipmap level 7
+internalformat=0x1908
+level=7
+width=0
+height=0
+pixels=NULL
+Mipmap level 8
+internalformat=0x1908
+level=8
+width=0
+height=0
+pixels=NULL
+Mipmap level 9
+internalformat=0x1908
+level=9
+width=0
+height=0
+pixels=NULL
+Mipmap level 10
+internalformat=0x1908
+level=10
+width=0
+height=0
+pixels=NULL
+firstFreeTexByte=0
+
+Start nmglGenTextures tests
+
+OK   Function: nmglGenTextures_genTextures_correctCountAndValues
+OK   Function: nmglGenTextures_genTextures_setContextCorrect
+
+End nmglGenTextures tests
+
+Start nmglBindTexture tests
+
+fillmipMap error! Pixels[4] is NULL!
+OK   Function: nmglBindTexture_wrongArgs_isError
+
+End nmglBindTexture tests
