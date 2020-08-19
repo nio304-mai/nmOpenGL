@@ -19,9 +19,9 @@ SECTION(".data_imu4")	float nmglBuffer3[12 * NMGL_SIZE];
 
 
 SECTION(".data_imu1")	float x0[NMGL_SIZE];
-SECTION(".data_imu2")	float y0[NMGL_SIZE];
+SECTION(".data_imu2")	float my_y0[NMGL_SIZE];
 SECTION(".data_imu3")	float x1[NMGL_SIZE];
-SECTION(".data_imu4")	float y1[NMGL_SIZE];
+SECTION(".data_imu4")	float my_y1[NMGL_SIZE];
 SECTION(".data_imu5")	float x2[NMGL_SIZE];
 SECTION(".data_imu6")	float y2[NMGL_SIZE];
 SECTION(".data_imu7")	int z_int[NMGL_SIZE];
@@ -92,9 +92,9 @@ SECTION(".text_nmglvs") int nmglvsNm0Init()
 	halHostSync(0x600DB00F);	// send ok to host
 
 	cntxt->trianInner.x0 = x0;
-	cntxt->trianInner.y0 = y0;
+	cntxt->trianInner.y0 = my_y0;
 	cntxt->trianInner.x1 = x1;
-	cntxt->trianInner.y1 = y1;
+	cntxt->trianInner.y1 = my_y1;
 	cntxt->trianInner.x2 = x2;
 	cntxt->trianInner.y2 = y2;
 	cntxt->trianInner.z = z_int;
@@ -103,9 +103,9 @@ SECTION(".text_nmglvs") int nmglvsNm0Init()
 	cntxt->trianInner.size = 0;
 
 	cntxt->lineInner.x0 = x0;
-	cntxt->lineInner.y0 = y0;
+	cntxt->lineInner.y0 = my_y0;
 	cntxt->lineInner.x1 = x1;
-	cntxt->lineInner.y1 = y1;
+	cntxt->lineInner.y1 = my_y1;
 	cntxt->lineInner.z = z_int;
 	cntxt->lineInner.colors = lightsValues;
 	cntxt->lineInner.maxSize = NMGL_SIZE;
