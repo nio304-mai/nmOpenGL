@@ -191,8 +191,8 @@ int fillMipMap( int texture,NMGLint format,NMGLint width,NMGLint height,NMGLubyt
 int run_nmglBindTexture_test()
 {	
 	printf ("\nStart nmglBindTexture tests\n\n");
-		RUN_TEST(nmglBindTexture_bindTexture_contextStateCorrect);
 		RUN_TEST(nmglBindTexture_wrongArgs_isError);
+		RUN_TEST(nmglBindTexture_bindTexture_contextStateCorrect);
 	printf ("\nEnd nmglBindTexture tests\n");
 	return 0;
 }
@@ -248,7 +248,7 @@ int nmglBindTexture_bindTexture_contextStateCorrect()
 	cntxt->texState.texObjects[1].texImages2D[0].pixels=testTexBytes;
 	for(int i=1;i<=USED_MIPMAP_LVL;i++)
 	{
-		/*!!!!!*/cntxt->texState.texObjects[1].texImages2D[i].pixels=(NMGLubyte *)cntxt->texState.texObjects[1].texImages2D[i].pixels+(USED_SIDE>>(i-1))*(USED_SIDE>>(i-1))*UBYTES_PER_TEXEL;
+		/*!!!!!*/cntxt->texState.texObjects[1].texImages2D[i].pixels=(NMGLubyte *)cntxt->texState.texObjects[1].texImages2D[i-1].pixels+(USED_SIDE>>(i-1))*(USED_SIDE>>(i-1))*UBYTES_PER_TEXEL;
 	}
 	
 		
@@ -281,7 +281,7 @@ if(_st != 0) return 2;
 
 for(int i=1;i<=USED_MIPMAP_LVL;i++)
 	{
-	/*!!!*/	cntxt->texState.texObjects[2].texImages2D[i].pixels=(NMGLubyte *)cntxt->texState.texObjects[2].texImages2D[i].pixels+(USED_SIDE>>(i-1))*(USED_SIDE>>(i-1))*UBYTES_PER_TEXEL;
+	/*!!!*/	cntxt->texState.texObjects[2].texImages2D[i].pixels=(NMGLubyte *)cntxt->texState.texObjects[2].texImages2D[i-1].pixels+(USED_SIDE>>(i-1))*(USED_SIDE>>(i-1))*UBYTES_PER_TEXEL;
 	}
 _st=fillMipMap(2,NMGL_RGBA,USED_SIDE,USED_SIDE,0xAA);
 if(_st != 0) return 2;

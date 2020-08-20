@@ -124,7 +124,13 @@ int main()
 #ifdef TEST_NMGL_TEX_COORD_POINTER
 	run_nmglTexCoordPointer_test();
 #endif
+while(nmglvsNm0Run()){
+		nmglClear(NMGL_COLOR_BUFFER_BIT);
 
+		nmglDrawArrays(NMGL_TRIANGLES, 0, 6);
+
+		nmglvsSwapBuffer();
+	}
 
 //=========/RUNNING=TESTS======================================================
 	

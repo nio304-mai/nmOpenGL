@@ -50,11 +50,6 @@ $(HOST).vcxproj:
 run: $(TARGET0) $(TARGET1) $(HOST)
 	bin\debug\$(HOST)
 
-debug: CXXFLAGS += -DDEBUG
-debug: CCFLAGS += -DDEBUG
-debug: $(TARGET0) $(TARGET1) $(HOST)
-	bin\debug\$(HOST)	
-
 libs:
 	$(MAKE) -C $(ROOT)/make/nmopengl-nmc4 -f ./Makefile
 	$(MAKE) -C $(ROOT)/make/nmopengl-nmc4f -f ./Makefile

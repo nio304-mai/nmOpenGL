@@ -130,7 +130,7 @@ $(PROVIDER).vcproj :	premake5.lua
 	premake5 vs2005
 
 vs2015:   $(PROVIDER).vcxproj
-	"$(VS140COMNTOOLS)vsvars32" && msbuild $(PROVIDER).vcxproj
+	"$(VS140COMNTOOLS)vsvars32" && msbuild $(PROVIDER).vcxproj 
 #	"$(VS140COMNTOOLS)vsvars32" && msbuild $(PROJECT).vcxproj /p:Configuration=Release
 
 include $(ROOT)/clean.mk
