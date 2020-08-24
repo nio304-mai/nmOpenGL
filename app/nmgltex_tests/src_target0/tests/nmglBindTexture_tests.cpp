@@ -33,7 +33,7 @@ void nmglBindTexture (NMGLenum target, NMGLuint texture);
 int _accum=0;
 int iterb=0;
 
-int cmpPixels32(void* from, void *to, NMGLint n_pixels);
+//int cmpPixels32(void* from, void *to, NMGLint n_pixels);
 int fillMipMap( int texture,NMGLint format,NMGLint width,NMGLint height,int filler);
 int cmpTexObj(TexObject* first,TexObject* second);
 int getMaxPower(NMGLuint x, NMGLuint y);
@@ -116,16 +116,6 @@ int cmpTexObj(TexObject* first,TexObject* second)
         {
             if(*((unsigned char *)first->texImages2D[i].pixels+j) !=*((unsigned char *)first->texImages2D[i].pixels+j)) {DEBUG_PRINT(("Tex objects dont match!Level:%d Pixels mismatch!\n",i));return 0;}
         }
-    }
-    return 1;
-}
-//-----------------------------------------------------------------------------------------------------
-int cmpPixels32(void* from, void *to, NMGLint n_pixels)
-{
-    int i=0;
-    for(i=0;i<n_pixels;i++)
-    {
-        if(*((NMGLint*)from+i) != *((NMGLint*)to+i)) return 0;
     }
     return 1;
 }
