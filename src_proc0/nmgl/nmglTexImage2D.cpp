@@ -56,7 +56,8 @@ void initLvls(NMGLuint name,NMGL_Context_NM0 *cntxt)
 DEBUG_PRINT(("Initlvls:texture:%d firstFreeTexByte=%x\n",name,cntxt->texState.firstFreeTexByte));
 	if(cntxt->texState.firstFreeTexByte==NULL)
 	{
-		cntxt->texState.firstFreeTexByte=(void*)mipmap;		
+		cntxt->texState.firstFreeTexByte=(void*)mipmap;	
+		DEBUG_PRINT(("mipmap=0x%x\n",mipmap));	
 	}
 	cntxt->texState.texObjects[name].texImages2D[0].pixels=cntxt->texState.firstFreeTexByte;
 	
@@ -97,7 +98,7 @@ int copyPixels(const void* pfrom,NMGLint format,NMGLint width,NMGLint height,voi
 	   return -1;
    }
     xlen=xw*xh*size;
-
+	//printf("w=%d h=%d s=%d\n",xw,xh,size);
     //if(*pto != NULL) free(*pto);
 
 	//*pto=malloc(4*xlen);

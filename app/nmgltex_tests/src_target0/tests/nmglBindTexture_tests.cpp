@@ -1,11 +1,16 @@
+
 #include "demo3d_nm0.h"
 #include "demo3d_nm1.h"
 #include "tests.h"
 #include "nmgl_tex_test_common.h"
 
 
-#include <iostream>
+//#include <iostream>
 extern void* cntxtAddr_nm1;
+#ifdef __GNUC__
+#pragma code_section ".text_tex_tests"
+#pragma data_section ".data_tex_tests"
+#endif
 NMGL_Context_NM1 *cntxt_nm1;
 extern int getTexelSizeUbytes(NMGLint format);
 int isPowerOf2(NMGLint x);

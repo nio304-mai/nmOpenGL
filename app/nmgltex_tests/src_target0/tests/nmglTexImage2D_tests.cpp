@@ -5,9 +5,9 @@
 #include "nmgl_tex_test_common.h"
 
 //#include <iostream>
-#include <assert.h>
+//#include <assert.h>
 //#include <malloc.h>
-#include <cstdlib>
+//#include <cstdlib>
 
 /*
 From OpenGL SC 1.0.1 spec:
@@ -66,6 +66,10 @@ pname:TEXTURE_MIN_FILTER,TEXTURE_MAG_FILTER
 pname:TEXTURE_WRAP_S,TEXTURE_WRAP_T
 
 */
+#ifdef __GNUC__
+#pragma code_section ".text_tex_tests"
+#pragma data_section ".data_tex_tests"
+#endif
 NMGL_Context_NM0 *cntxt;
 extern void* cntxtAddr_nm1;
 NMGL_Context_NM1 *nm1cntxt;
@@ -93,7 +97,7 @@ typedef struct TexImage2D_data
 //---------------------------------------------------------------------------
 TexImage2D_data input;//main input data;	
 	//-----------curs-------------------------
-	NMGLint cur_format;
+	//NMGLint cur_format;
 	NMGLint cur_width;
 	//----------------------------------------
 	int status=0;
@@ -136,35 +140,40 @@ void init_internalformats()
 int cmpPixelsUbytes(void* from, void *to, NMGLint n_pixels)
 {
     int i=0;
-	/*
-    for(i=0;i<n_pixels;i++)
-    {
-        if(*((NMGLubyte*)from+i) != *((NMGLubyte*)to+i)) return 0;
-    }
-    */
+  /*
    printf("n_pixels=%d\n",n_pixels);
    printf("from=0x%x\n",from);
    printf("to=0x%x\n",to);
+   printf("firstBfrom=0x%x\n",*(NMGLubyte*)from);
+   printf("firstBto=0x%x\n",*(NMGLubyte*)to);
+   */
+  for(i=0;i<n_pixels;i++)
+  {
+	  if(*((NMGLubyte*)from+i) != *((NMGLubyte*)to+i) )
+	  {
+		  printf("i=%d mismatch. from/to=0x%x/0x%x ",i,*((NMGLubyte*)from+i),	*((NMGLubyte*)to+i));
+		  return 0;
+	  }
+  }
 	return 1;
 	
 }
 //----------------------------------------------------------------------------------------
-void fillPixels (void *pixels,NMGLint size)
+void fillPixels (void **pixels,NMGLint size)
 {
 	static int t=0xAA;
 	int i=0;
+	NMGLubyte *p=(NMGLubyte*)*pixels;
 	for(i=0;i<size;i++,t++)
 	{
-		*((NMGLubyte*)pixels + i)=t;
+		*((NMGLubyte*)(p + i))=t;
 	}
-
-
 }
 //----------------------------------------------------------------------------------------
 
 NMGLint init_TexImage2D_input(TexImage2D_data* data,NMGLint width,internalformatdata internalformat,NMGLint lvl=0)
 {
-	NMGLint pixelsize=4;
+	
 	NMGLint picture_size_;
 	
 	picture_size_=width*width*getTexelSizeUbytes(internalformat.type);	
@@ -173,7 +182,7 @@ NMGLint init_TexImage2D_input(TexImage2D_data* data,NMGLint width,internalformat
 	data->type=NMGL_UNSIGNED_BYTE;//UNSIGNED_BYTE
 	data->format=internalformat.type;//must match internalformat
 
-	cur_format=internalformat.type;	
+	//cur_format=internalformat.type;	
 
 	data->internalformat.type=internalformat.type;
 	data->internalformat.size=internalformat.size;
@@ -182,7 +191,7 @@ NMGLint init_TexImage2D_input(TexImage2D_data* data,NMGLint width,internalformat
 	
 	data->pixels=texels;
 	
-		fillPixels(data->pixels,picture_size_);		
+		fillPixels(&data->pixels,picture_size_);		
 	
 	return 0;
 }
@@ -219,42 +228,7 @@ void _nmglTexImage2D_init_context()
 
 	cntxt->texState.texUnits[0].boundTexObject=&cntxt->texState.texObjects[0];
 }
-//----------------------------------------------------------------------------------------
-/*
-	Заполняет поля активного текстурного объекта значениями соответствующих полей входного текстурного объекта
-*/
-void _nmglTexImage2D_update_active_object(NMGLint level)
-{
-	void*  mstatus=0;
-	//int i=0;
-	//unsigned int n_bytes=0;
-unsigned int n_pixels=0;
 
-NMGLint pyxelsize=4;
-
-
-	if ((level>=0)&&(level<=NMGL_MAX_MIPMAP_LVL))
-	{
-		cntxt->texState.texUnits[0].boundTexObject->texImages2D[level].internalformat=input.internalformat.type;
-		//cntxt->texState.texUnits[0].boundTexObject->texImages2D[level].level=input.level;
-		cntxt->texState.texUnits[0].boundTexObject->texImages2D[level].width=input.width;
-		cntxt->texState.texUnits[0].boundTexObject->texImages2D[level].height=input.height;
-		//cntxt->texState.texUnits[0].boundTexObject->texImages2D[level].border=0;
-		//n_bytes=input.internalformat.size*input.width*input.height;
-		n_pixels=input.width*input.height*input.internalformat.size;
-		//mstatus=malloc(n_bytes);
-		
-		//ActiveTexObjectP->texImages2D[level].pixels=texels;
-		//for(i=0;i<n_bytes;i++)
-		for(i=0;i<n_pixels;i++)
-		{
-			//*((unsigned char*)cntxt->texState.texUnits[0].boundTexObject->texImages2D[level].pixels+i)=*((unsigned char *)input.pixels+i);
-			*((NMGLubyte*)ActiveTexObjectP->texImages2D[level].pixels+i)=*((NMGLubyte *)input.pixels+i);
-		}
-		
-
-	}
-}
 //-----------------------------------------------------------------------------------------
 /*
 	Сравнивает входной и активный текстурные объекты 
@@ -286,7 +260,7 @@ int _nmglTexImage2D_check(NMGLint level)
 			printf("Error!Heights formats dont match!\n");
 			return 1;
 		}
-		
+		DEBUG_PRINT(("w=%d h=%d s=%d\n",input.width,input.height,getTexelSizeUbytes(input.internalformat.type)));
 		if(!cmpPixelsUbytes(ActiveTexObjectP->texImages2D[level].pixels,input.pixels,input.width*input.height*getTexelSizeUbytes(input.internalformat.type)))
 		{
 			printf("Error!Pixels arrays dont match!\n");
@@ -314,6 +288,7 @@ void _nmglTexImage2D_prevent_internal_errors()
 	ActiveTexObjectP->imageIsSet=0;
 }
 //----------------------------------------------------------------------------------------
+/*
 void print_input()
 {
 	DEBUG_PRINT(("=========Input Contents====================\n"));
@@ -324,7 +299,7 @@ void print_input()
 	DEBUG_PRINT(("Type=%d\n",input.type));
 	DEBUG_PRINT(("===========================================\n"));
 }
-
+*/
 //========================================================================================
 //===========================MAIN=========================================================
 //========================================================================================
@@ -335,12 +310,12 @@ int run_nmglTexImage2D_test()
 	nm1cntxt = (NMGL_Context_NM1*)cntxtAddr_nm1;
 	init_internalformats();
 	cur_width=USED_SIDE;	
-	cur_format=internalformats[0].type;
+//	cur_format=internalformats[0].type;
 
 	_nmglTexImage2D_init_context();
 	
 	
-	print_input();
+	//print_input();
 	/*
 	_nmglTexImage2D_init_context();
 	//_nmglTexImage2D_update_active_object();
@@ -349,7 +324,6 @@ DEBUG_PRINT(("------------------------------------------------------------------
 
 	printf ("\nStart nmglTexImage2D tests\n\n");
 //#if 0
-	printf("texels=%x\n",texels);
 	RUN_TEST(nmglTexImage2D_wrongTarget_isError);
 	RUN_TEST(nmglTexImage2D_wrongLevel_isError);
 	RUN_TEST(nmglTexImage2D_wrongLevelAndSize_isError);
@@ -358,9 +332,9 @@ DEBUG_PRINT(("------------------------------------------------------------------
 	RUN_TEST(nmglTexImage2D_wrongHeight_isError);
 	RUN_TEST(nmglTexImage2D_wrongBorder_isError);
 	RUN_TEST(nmglTexImage2D_wrongType_isError);
-	
+//#endif	
 	RUN_TEST(nmglTexImage2D_setImage_contextSetCorrect);
-//#endif
+//
 _nmglTexImage2D_prevent_internal_errors();
 	
 	printf ("\nEnd nmglTexImage2D tests\n");
@@ -384,8 +358,11 @@ int nmglTexImage2D_wrongTarget_isError()
 	TEST_ASSERT(cntxt->error == NMGL_INVALID_ENUM);
 	
 	_nmglTexImage2D_prevent_internal_errors();
-	
+//printf("Before:firstFreeTexByte=0x%x\n",cntxt->texState.firstFreeTexByte);
 	nmglTexImage2D(input.target,input.level,input.internalformat.type,input.width,input.height,0,input.internalformat.type,input.type,input.pixels);
+//printf("After:firstFreeTexByte=0x%x\n",cntxt->texState.firstFreeTexByte);
+
+	
 	
 	TEST_ASSERT(cntxt->error == NMGL_NO_ERROR);
 
@@ -453,31 +430,73 @@ return 0;
 int nmglTexImage2D_wrongInternalformatFormat_isError()
 {
 	//_nmglTexImage2D_prevent_internal_errors();
+	int i=0,j=0;
 	
-	for(i=0;i<5;i++)
-	{
-		status=init_TexImage2D_input(&input,cur_width,internalformats[i]);
+	//for(i=4;i>=0;i--)
+//	{
+		status=init_TexImage2D_input(&input,cur_width,internalformats[0]);
 		
-		nmglTexImage2D(input.target,input.level,cur_format,input.width,input.height,0,cur_format,input.type,input.pixels);
+		nmglTexImage2D(input.target,input.level,input.internalformat.type,input.width,input.height,0,input.format,input.type,input.pixels);
 		TEST_ASSERT(cntxt->error==NMGL_NO_ERROR);
-		_nmglTexImage2D_prevent_internal_errors();//CHANGE_REPORT		
-	}
+		_nmglTexImage2D_prevent_internal_errors();//CHANGE_REPORT	
+
+		status=init_TexImage2D_input(&input,cur_width,internalformats[1]);		
+		nmglTexImage2D(input.target,input.level,input.internalformat.type,input.width,input.height,0,input.format,input.type,input.pixels);
+		TEST_ASSERT(cntxt->error==NMGL_NO_ERROR);
+		_nmglTexImage2D_prevent_internal_errors();
+
+		status=init_TexImage2D_input(&input,cur_width,internalformats[2]);
+		nmglTexImage2D(input.target,input.level,input.internalformat.type,input.width,input.height,0,input.format,input.type,input.pixels);
+		TEST_ASSERT(cntxt->error==NMGL_NO_ERROR);
+		_nmglTexImage2D_prevent_internal_errors();	
+
+
+		status=init_TexImage2D_input(&input,cur_width,internalformats[3]);
+		nmglTexImage2D(input.target,input.level,input.internalformat.type,input.width,input.height,0,input.format,input.type,input.pixels);
+		TEST_ASSERT(cntxt->error==NMGL_NO_ERROR);
+		_nmglTexImage2D_prevent_internal_errors();	
+
+		/*
+		printf("format3=0x%x size=%d\n",internalformats[3].type,internalformats[3].size);		
+		printf("format4=0x%x size=%d\n",internalformats[4].type,internalformats[4].size);
+
+		printf("format3=0x%x size=%d\n",internalformats[3].type,internalformats[3].size);		
+		printf("format4=0x%x size=%d\n",internalformats[4].type,internalformats[4].size);		
+
+		printf("format3=0x%x size=%d\n",internalformats[3].type,internalformats[3].size);		
+		printf("format4=0x%x size=%d\n",internalformats[4].type,internalformats[4].size);
+		
+		*/
+/*
+		status=init_TexImage2D_input(&input,cur_width,internalformats[4]);
+		nmglTexImage2D(input.target,input.level,input.internalformat.type,input.width,input.height,0,input.format,input.type,input.pixels);
+		TEST_ASSERT(cntxt->error==NMGL_NO_ERROR);
+		_nmglTexImage2D_prevent_internal_errors();
+*/
+	//}
+	
+status=init_TexImage2D_input(&input,cur_width,internalformats[0]);
 	input.internalformat.type=(internalformats[0].type<<1)+1;
 	input.format=input.internalformat.type;
+
 	nmglTexImage2D(input.target,input.level,input.internalformat.type,input.width,input.height,0,input.format,input.type,input.pixels);
 	TEST_ASSERT(cntxt->error==NMGL_INVALID_VALUE);
-	_nmglTexImage2D_prevent_internal_errors();//CHANGE_REPORT		
+	_nmglTexImage2D_prevent_internal_errors();//CHANGE_REPORT	
+
 	input.format=input.internalformat.type+1;
+
 	nmglTexImage2D(input.target,input.level,input.internalformat.type,input.width,input.height,0,input.format,input.type,input.pixels);
 	TEST_ASSERT(cntxt->error==NMGL_INVALID_VALUE);
-		_nmglTexImage2D_prevent_internal_errors();	
-		nmglTexImage2D(input.target,input.level,NMGL_RGBA,input.width,input.height,0,NMGL_RGB,input.type,input.pixels);
+	_nmglTexImage2D_prevent_internal_errors();
+
+	nmglTexImage2D(input.target,input.level,NMGL_RGBA,input.width,input.height,0,NMGL_RGB,input.type,input.pixels);
 	TEST_ASSERT(cntxt->error==NMGL_INVALID_VALUE);
-	_nmglTexImage2D_prevent_internal_errors();	
-		nmglTexImage2D(input.target,input.level,NMGL_RGBA,input.width,input.height,0,NMGL_RGBA,input.type,input.pixels);
+	_nmglTexImage2D_prevent_internal_errors();
+
+	nmglTexImage2D(input.target,input.level,NMGL_RGBA,input.width,input.height,0,NMGL_RGBA,input.type,input.pixels);
 	TEST_ASSERT(cntxt->error==NMGL_NO_ERROR);
 
-		nmglTexImage2D(input.target,input.level,NMGL_RGB,input.width,input.height,0,NMGL_RGB,input.type,input.pixels);
+	nmglTexImage2D(input.target,input.level,NMGL_RGB,input.width,input.height,0,NMGL_RGB,input.type,input.pixels);
 	TEST_ASSERT(cntxt->error==NMGL_INVALID_OPERATION);
 
 	_nmglTexImage2D_prevent_internal_errors();
@@ -561,15 +580,15 @@ int nmglTexImage2D_setImage_contextSetCorrect()
 	int i=0;
 
 	_nmglTexImage2D_prevent_internal_errors();
-
+ActiveTexObjectP=&cntxt->texState.texObjects[0];
 	//cur_width=NMGL_MAX_TEX_SIDE;
 	cur_width=USED_SIDE;
 		status=init_TexImage2D_input(&input,cur_width,internalformats[0],i);
-		printf("cur_width=%d\n",cur_width);		
-		printf("format=%d should be %d\n",internalformats[0].type,NMGL_RGBA);		
+		//printf("cur_width=%d\n",cur_width);		
+		//printf("format=%d should be %d\n",internalformats[0].type,NMGL_RGBA);		
 		nmglTexImage2D(input.target,input.level,input.internalformat.type,input.width,input.height,0,input.format,input.type,input.pixels);
-		//status=_nmglTexImage2D_check(0);
-		status=0;
+		status=_nmglTexImage2D_check(0);
+		
 	TEST_ASSERT(status==0);	
 	
 	
