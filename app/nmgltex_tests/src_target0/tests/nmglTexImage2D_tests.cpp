@@ -286,6 +286,20 @@ void _nmglTexImage2D_prevent_internal_errors()
 {
 	cntxt->error=NMGL_NO_ERROR;
 	ActiveTexObjectP->imageIsSet=0;
+	printf("firstByte was=0x%x  mipmap size is %d\n",cntxt->texState.firstFreeTexByte,MIPMAP_TESTOBJ_SIZE);
+	cntxt->texState.firstFreeTexByte = NULL;
+	/*
+	if ((int)cntxt->texState.firstFreeTexByte == MIPMAP_OBJ_SIZE)
+	{
+		cntxt->texState.firstFreeTexByte = NULL;
+		printf("was MIPMAP_OBJ_SIZE\n");
+	}
+	else 
+	{
+		cntxt->texState.firstFreeTexByte=(void*)((int)cntxt->texState.firstFreeTexByte - MIPMAP_OBJ_SIZE);
+		printf("was BIGGER\n");
+	}
+	*/
 }
 //----------------------------------------------------------------------------------------
 /*
@@ -432,14 +446,14 @@ int nmglTexImage2D_wrongInternalformatFormat_isError()
 	//_nmglTexImage2D_prevent_internal_errors();
 	int i=0,j=0;
 	
-	//for(i=4;i>=0;i--)
-//	{
-		status=init_TexImage2D_input(&input,cur_width,internalformats[0]);
+	for(i=0;i<=4;i++)
+	{
+		status=init_TexImage2D_input(&input,cur_width,internalformats[i]);
 		
 		nmglTexImage2D(input.target,input.level,input.internalformat.type,input.width,input.height,0,input.format,input.type,input.pixels);
 		TEST_ASSERT(cntxt->error==NMGL_NO_ERROR);
 		_nmglTexImage2D_prevent_internal_errors();//CHANGE_REPORT	
-
+/*
 		status=init_TexImage2D_input(&input,cur_width,internalformats[1]);		
 		nmglTexImage2D(input.target,input.level,input.internalformat.type,input.width,input.height,0,input.format,input.type,input.pixels);
 		TEST_ASSERT(cntxt->error==NMGL_NO_ERROR);
@@ -455,7 +469,7 @@ int nmglTexImage2D_wrongInternalformatFormat_isError()
 		nmglTexImage2D(input.target,input.level,input.internalformat.type,input.width,input.height,0,input.format,input.type,input.pixels);
 		TEST_ASSERT(cntxt->error==NMGL_NO_ERROR);
 		_nmglTexImage2D_prevent_internal_errors();	
-
+*/
 		/*
 		printf("format3=0x%x size=%d\n",internalformats[3].type,internalformats[3].size);		
 		printf("format4=0x%x size=%d\n",internalformats[4].type,internalformats[4].size);
@@ -473,7 +487,7 @@ int nmglTexImage2D_wrongInternalformatFormat_isError()
 		TEST_ASSERT(cntxt->error==NMGL_NO_ERROR);
 		_nmglTexImage2D_prevent_internal_errors();
 */
-	//}
+	}
 	
 status=init_TexImage2D_input(&input,cur_width,internalformats[0]);
 	input.internalformat.type=(internalformats[0].type<<1)+1;
