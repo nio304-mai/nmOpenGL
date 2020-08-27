@@ -53,15 +53,32 @@ void initLvls(NMGLuint name,NMGL_Context_NM0 *cntxt)
 	//MIPMAP_OBJ_SIZE
 	int i=0;
 	unsigned long cursize=NMGL_MAX_TEX_SIDE*NMGL_MAX_TEX_SIDE*UBYTES_PER_TEXEL;
-DEBUG_PRINT(("Initlvls:texture:%d firstFreeTexByte=%x\n",name,cntxt->texState.firstFreeTexByte));
+//DEBUG_PRINT(("Initlvls:texture:%d firstFreeTexByte=%x\n",name,cntxt->texState.firstFreeTexByte));
+	#if 0
+	/*
 	if(cntxt->texState.firstFreeTexByte==NULL)
 	{
 		cntxt->texState.firstFreeTexByte=(void*)mipmap;	
 		DEBUG_PRINT(("mipmap=0x%x\n",mipmap));	
 	}
 	cntxt->texState.texObjects[name].texImages2D[0].pixels=cntxt->texState.firstFreeTexByte;
-	
-/*sync*/cntxt->synchro.writeInstr(1, NMC1_SET_MIPMAP_LVL_POINTER,(int)(name),0,(int)cntxt->texState.firstFreeTexByte);
+	*/
+/*sync*/
+/*cntxt->synchro.writeInstr(1, NMC1_SET_MIPMAP_LVL_POINTER,(int)(name),0,(int)cntxt->texState.firstFreeTexByte);
+	for(i=1;i<=NMGL_MAX_MIPMAP_LVL;i++)
+	{
+		cntxt->texState.texObjects[name].texImages2D[i].pixels=(void*)((NMGLubyte *)cntxt->texState.texObjects[name].texImages2D[i-1].pixels+cursize);
+*/
+/*sync*/
+/*cntxt->synchro.writeInstr(1, NMC1_SET_MIPMAP_LVL_POINTER,(int)(name),i,(int)((NMGLubyte *)cntxt->texState.texObjects[name].texImages2D[i].pixels));
+
+		cursize>>=2;
+	}
+	cntxt->texState.firstFreeTexByte=(void*)((NMGLubyte *)cntxt->texState.texObjects[name].texImages2D[NMGL_MAX_MIPMAP_LVL].pixels+UBYTES_PER_TEXEL);
+	*/
+	#endif
+
+	cntxt->texState.texObjects[name].texImages2D[0].pixels=(void*)(mipmap + (name*MIPMAP_OBJ_SIZE));
 	for(i=1;i<=NMGL_MAX_MIPMAP_LVL;i++)
 	{
 		cntxt->texState.texObjects[name].texImages2D[i].pixels=(void*)((NMGLubyte *)cntxt->texState.texObjects[name].texImages2D[i-1].pixels+cursize);
@@ -69,7 +86,6 @@ DEBUG_PRINT(("Initlvls:texture:%d firstFreeTexByte=%x\n",name,cntxt->texState.fi
 
 		cursize>>=2;
 	}
-	cntxt->texState.firstFreeTexByte=(void*)((NMGLubyte *)cntxt->texState.texObjects[name].texImages2D[NMGL_MAX_MIPMAP_LVL].pixels+UBYTES_PER_TEXEL);
 }
 /*
 1 - if x is power of 2

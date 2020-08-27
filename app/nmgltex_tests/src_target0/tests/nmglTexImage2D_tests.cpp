@@ -73,7 +73,7 @@ pname:TEXTURE_WRAP_S,TEXTURE_WRAP_T
 NMGL_Context_NM0 *cntxt;
 extern void* cntxtAddr_nm1;
 NMGL_Context_NM1 *nm1cntxt;
-SECTION(".data_DDR") NMGLubyte texels[USED_SIDE*USED_SIDE*UBYTES_PER_TEXEL];
+SECTION(".data_tex_tests") NMGLubyte texels[USED_SIDE*USED_SIDE*UBYTES_PER_TEXEL];
 extern int getTexelSizeUbytes(NMGLint format);
 /////////////////DATA///STRUCTURES///////////////////////////////////////
 typedef struct internalformatdata
@@ -286,8 +286,8 @@ void _nmglTexImage2D_prevent_internal_errors()
 {
 	cntxt->error=NMGL_NO_ERROR;
 	ActiveTexObjectP->imageIsSet=0;
-	printf("firstByte was=0x%x  mipmap size is %d\n",cntxt->texState.firstFreeTexByte,MIPMAP_TESTOBJ_SIZE);
-	cntxt->texState.firstFreeTexByte = NULL;
+	//printf("firstByte was=0x%x  mipmap size is %d\n",cntxt->texState.firstFreeTexByte,MIPMAP_TESTOBJ_SIZE);
+	//cntxt->texState.firstFreeTexByte = NULL;
 	/*
 	if ((int)cntxt->texState.firstFreeTexByte == MIPMAP_OBJ_SIZE)
 	{
@@ -426,8 +426,8 @@ int nmglTexImage2D_wrongLevelAndSize_isError()
 	ActiveTexObjectP->texMinFilter=NMGL_NEAREST_MIPMAP_NEAREST;
 	status=init_TexImage2D_input(&input,cur_width,internalformats[0]);//CHANGE_REPORT
 		nmglTexImage2D(input.target,input.level,input.internalformat.type,input.width,input.height,0,input.internalformat.type,input.type,input.pixels);
-	status=init_TexImage2D_input(&input,cur_width>>1,internalformats[0]);
-	input.level=1;
+	status=init_TexImage2D_input(&input,cur_width>>1,internalformats[0],1);
+	
 		nmglTexImage2D(input.target,input.level,input.internalformat.type,input.width,input.height,0,input.internalformat.type,input.type,input.pixels);
 
 	TEST_ASSERT(cntxt->error==NMGL_NO_ERROR);
@@ -452,41 +452,8 @@ int nmglTexImage2D_wrongInternalformatFormat_isError()
 		
 		nmglTexImage2D(input.target,input.level,input.internalformat.type,input.width,input.height,0,input.format,input.type,input.pixels);
 		TEST_ASSERT(cntxt->error==NMGL_NO_ERROR);
-		_nmglTexImage2D_prevent_internal_errors();//CHANGE_REPORT	
-/*
-		status=init_TexImage2D_input(&input,cur_width,internalformats[1]);		
-		nmglTexImage2D(input.target,input.level,input.internalformat.type,input.width,input.height,0,input.format,input.type,input.pixels);
-		TEST_ASSERT(cntxt->error==NMGL_NO_ERROR);
-		_nmglTexImage2D_prevent_internal_errors();
-
-		status=init_TexImage2D_input(&input,cur_width,internalformats[2]);
-		nmglTexImage2D(input.target,input.level,input.internalformat.type,input.width,input.height,0,input.format,input.type,input.pixels);
-		TEST_ASSERT(cntxt->error==NMGL_NO_ERROR);
 		_nmglTexImage2D_prevent_internal_errors();	
 
-
-		status=init_TexImage2D_input(&input,cur_width,internalformats[3]);
-		nmglTexImage2D(input.target,input.level,input.internalformat.type,input.width,input.height,0,input.format,input.type,input.pixels);
-		TEST_ASSERT(cntxt->error==NMGL_NO_ERROR);
-		_nmglTexImage2D_prevent_internal_errors();	
-*/
-		/*
-		printf("format3=0x%x size=%d\n",internalformats[3].type,internalformats[3].size);		
-		printf("format4=0x%x size=%d\n",internalformats[4].type,internalformats[4].size);
-
-		printf("format3=0x%x size=%d\n",internalformats[3].type,internalformats[3].size);		
-		printf("format4=0x%x size=%d\n",internalformats[4].type,internalformats[4].size);		
-
-		printf("format3=0x%x size=%d\n",internalformats[3].type,internalformats[3].size);		
-		printf("format4=0x%x size=%d\n",internalformats[4].type,internalformats[4].size);
-		
-		*/
-/*
-		status=init_TexImage2D_input(&input,cur_width,internalformats[4]);
-		nmglTexImage2D(input.target,input.level,input.internalformat.type,input.width,input.height,0,input.format,input.type,input.pixels);
-		TEST_ASSERT(cntxt->error==NMGL_NO_ERROR);
-		_nmglTexImage2D_prevent_internal_errors();
-*/
 	}
 	
 status=init_TexImage2D_input(&input,cur_width,internalformats[0]);
