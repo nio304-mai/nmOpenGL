@@ -687,6 +687,14 @@ void textureTriangle(TrianglesInfo* triangles, nm32s* pDstTriangle, int count)
 			
 			//scaleFactor = fmax(mu, mv);
 			findMax2(vecmu, vecmv, vecScaleFactor, primWidth);
+#else //SCALE_FACTOR_IDEAL
+		    // TODO: vectorize	
+            for(int x = 0; x < primWidth; x++){
+				vecScaleFactor[x] = fmax(sqrtf(vecdudx[x]*vecdudx[x] + 
+							vecdvdx[x]*vecdvdx[x]), 
+						sqrtf(vecdudy[x]*vecdudy[x] + vecdvdy[x]*vecdvdy[x]));
+			}
+
 #endif //SCALE_FACTOR_IDEAL
 					//printf("Scale factor = %f\n", scaleFactor);
 
@@ -695,17 +703,7 @@ void textureTriangle(TrianglesInfo* triangles, nm32s* pDstTriangle, int count)
 				Vec2f st;
 				st.x = vecs[x];
 				st.y = vect[x];
-
-/*Calculate scale factor*/
-#ifdef SCALE_FACTOR_IDEAL
-				float dudx = vecdudx[x];
-				float dudy = vecdudy[x];
-				float dvdx = vecdvdx[x];
-				float dvdy = vecdvdy[x];	
-				scaleFactor = fmax(sqrtf(dudx*dudx + dvdx*dvdx), sqrtf(dudy*dudy + dvdy*dvdy));
-#else //SCALE_FACTOR_IDEAL
 				scaleFactor = vecScaleFactor [x];
-#endif //SCALE_FACTOR_IDEAL				
 
 /*Calculate level of detail*/
 
