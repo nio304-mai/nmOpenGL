@@ -16,6 +16,9 @@
 // typedef enum { NEAREST, LINEAR, NEAREST_MIPMAP_NEAREST, NEAREST_MIPMAP_LINEAR, LINEAR_MIPMAP_NEAREST, LINEAR_MIPMAP_LINEAR } filter_mode_t;
 // typedef enum { REPEAT, CLAMP_TO_EDGE } wrap_mode_t;
 typedef enum { MINIFICATION, MAGNIFICATION } lod_t;
+#define MAGNIFICATION_ 1.0f
+#define MINIFICATION_ 0.0f
+
 // typedef enum { MODULATE, REPLACE, DECAL, BLEND, ADD} texEnv_mode_t;
 
 typedef struct Vec2f {
@@ -93,6 +96,9 @@ SECTION(".data_imu0") float vecaf [32];
 SECTION(".data_imu0") float vecmu [32];
 SECTION(".data_imu0") float vecmv [32];
 SECTION(".data_imu0") float vecScaleFactor [32];
+
+SECTION(".data_imu0") float vecLod [32];
+SECTION(".data_imu0") float vecMinMagFlag[32];
 
 SECTION(".data_imu0") float buf0 [32];
 SECTION(".data_imu0") float buf1 [32];
@@ -696,37 +702,49 @@ void textureTriangle(TrianglesInfo* triangles, nm32s* pDstTriangle, int count)
 			}
 
 #endif //SCALE_FACTOR_IDEAL
-					//printf("Scale factor = %f\n", scaleFactor);
+
+/*Calculate level of detail*/
+			
+		 //TODO: vectorize lod_
+         for(int x = 0; x < primWidth; x++)
+		 {
+				//printf("Scale factor = %f\n", scaleFactor);
+
+				//// lod_ = log2f(scaleFactor);
+				buf0[x] = log2f(vecScaleFactor[x]);	
+		 }
+		 
+		 //TODO: vectorize lod and minMagFlag
+         for(int x = 0; x < primWidth; x++)
+		 {
+				if (NMGL_TEX_MIN_LOD > NMGL_TEX_MAX_LOD)
+				{
+					printf("Error. NMGL_TEX_MIN_LOD > NMGL_TEX_MAX_LOD. LOD is undefined. Exit\n");
+					return;
+				}
+				else if (buf0[x] > (float)NMGL_TEX_MAX_LOD) //lod_ > NMGL_TEX_MAX_LOD
+					vecLod[x] = NMGL_TEX_MAX_LOD;
+				else if (buf0[x] < (float)NMGL_TEX_MIN_LOD) //lod_ < NMGL_TEX_MIN_LOD
+					vecLod[x] = NMGL_TEX_MIN_LOD;
+				else
+					vecLod[x] = buf0[x]; // = lod_
+
+				//if (lod <= c)
+				if (vecLod[x] <= c) 
+					vecMinMagFlag[x] = MAGNIFICATION_;
+				else 
+					vecMinMagFlag[x] = MINIFICATION_;
+		 }
+
 
             for(int x = 0; x < primWidth; x++){
 
 				Vec2f st;
 				st.x = vecs[x];
 				st.y = vect[x];
-				scaleFactor = vecScaleFactor [x];
-
-/*Calculate level of detail*/
-
-				float lod = 0.0;
-				float lod_ = log2f(scaleFactor);
-
-				if (NMGL_TEX_MIN_LOD > NMGL_TEX_MAX_LOD)
-				{
-					printf("Error. NMGL_TEX_MIN_LOD > NMGL_TEX_MAX_LOD. LOD is undefined. Exit\n");
-					return;
-				}
-				else if (lod_ > NMGL_TEX_MAX_LOD)
-					lod = NMGL_TEX_MAX_LOD;
-				else if (lod_ < NMGL_TEX_MIN_LOD)
-					lod = NMGL_TEX_MIN_LOD;
-				else
-					lod = lod_;
-
-				//if ((lod < c) || (equalf(lod,c) == 1))
-				if (lod <= c) 
-					minMagFlag = MAGNIFICATION;
-				else 
-					minMagFlag = MINIFICATION;
+				
+				float lod = vecLod[x];
+				lod_t minMagFlag = (vecMinMagFlag[x] == MAGNIFICATION_) ? MAGNIFICATION : MINIFICATION;
 
 				//printf("Level of detail = %f\n", lod);
 				//printf("c = %f\n", c);
