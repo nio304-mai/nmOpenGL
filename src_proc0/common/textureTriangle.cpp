@@ -7,11 +7,14 @@
 #include <math.h>
 #include <float.h> //TODO: only FLT_EPSILON is used from float.h
 
+#include "time.h"
+
 #define TEXTURE_TRIANGLE_SECTION ".text"
 #define TEXTURE_ENABLED
 
 #ifdef TEXTURE_ENABLED
-// #define PERSPECTIVE_CORRECT
+#define PERSPECTIVE_CORRECT
+#define SCALE_FACTOR_IDEAL
 
 // typedef enum { NEAREST, LINEAR, NEAREST_MIPMAP_NEAREST, NEAREST_MIPMAP_LINEAR, LINEAR_MIPMAP_NEAREST, LINEAR_MIPMAP_LINEAR } filter_mode_t;
 // typedef enum { REPEAT, CLAMP_TO_EDGE } wrap_mode_t;
@@ -35,6 +38,77 @@ typedef struct color {
     unsigned char b;
     unsigned char a;
 } color;
+
+
+#define DECLARE_TIMECOUNTER(x) extern unsigned int x; clock_t clkStart_ ## x = 0;
+#define SET_START_TIME(x) clkStart_ ## x=clock();
+#define INCREASE_TIMECOUNTER(x) x+=clock()-clkStart_ ## x;
+
+extern unsigned int timeMod;
+extern unsigned int timeModf;
+extern unsigned int timeGetPixelValue;
+extern unsigned int timeDiv;
+extern unsigned int timeFmod;
+extern unsigned int timeMemAccess;
+extern unsigned int timeGetPixelNearest;
+extern unsigned int timeGetPixelLinear;
+
+
+clock_t clkStart_getPixelValue = 0;
+clock_t clkEnd_getPixelValue = 0;
+clock_t diff_ = 0;
+
+clock_t clkStart_getPixelLinear = 0;
+clock_t clkEnd_getPixelLinear = 0;
+clock_t clkStart_getPixelNearest = 0;
+clock_t clkEnd_getPixelNearest = 0;
+
+extern unsigned int timeGetPixelLinear_interpolatePixels;
+clock_t clkStart_interpolatePixels = 0;
+
+extern unsigned int timeGetPixelLinear_floor;
+clock_t clkStart_timeGetPixelLinear_floor = 0;
+
+extern unsigned int timeGetPixelLinear_modf;
+clock_t clkStart_timeGetPixelLinear_modf = 0;
+
+extern unsigned int timeLog2f;
+clock_t clkStart_timeLog2f = 0;
+
+extern unsigned int timeInterpolateMipmap;
+clock_t clkStart_timeInterpolateMipmap = 0;
+
+extern unsigned int timeInterpolateMipmap_modf;
+clock_t clkStart_timeInterpolateMipmap_modf = 0;
+
+extern unsigned int timeInterpolateMipmap_interp;
+clock_t clkStart_timeInterpolateMipmap_interp = 0;
+
+extern unsigned int timePerspectiveCorrect;
+clock_t clkStart_timePerspectiveCorrect = 0;
+
+extern unsigned int timePerspectiveCorrect_div;
+clock_t clkStart_timePerspectiveCorrect_div = 0;
+
+extern unsigned int timeSqrtf;
+clock_t clkStart_timeSqrtf = 0;
+
+extern unsigned int timeTexFunction;
+clock_t clkStart_timeTexFunction = 0;
+
+extern unsigned int timeBuildFbPixel;
+clock_t clkStart_timeBuildFbPixel = 0;
+
+extern unsigned int timeGetPixelLinear_getPixel;
+clock_t clkStart_timeGetPixelLinear_getPixel = 0;
+
+extern unsigned int timeWrapCoord;
+clock_t clkStart_timeWrapCoord = 0;
+
+DECLARE_TIMECOUNTER(timeWrapCoord_div)
+DECLARE_TIMECOUNTER(timeWrapCoord_repeat)
+DECLARE_TIMECOUNTER(timeWrapCoord_clamp)
+DECLARE_TIMECOUNTER(timeWrapCoord_calcMaxVal)
 
 // filter_mode_t textureMinFilter = NEAREST; //default NEAREST_MIPMAP_LINEAR
 // filter_mode_t textureMagFilter = NEAREST; //default LINEAR
@@ -146,6 +220,7 @@ SECTION(TEXTURE_TRIANGLE_SECTION)
 int getPixelValue(unsigned int x, unsigned int y, TexImage2D image, color * pixelValue)
 {
 
+    clkStart_getPixelValue = clock();
     unsigned int rowDataSize = 0;
     unsigned int rawDataSize = 0;
     unsigned int rowPadding = 0;
@@ -246,26 +321,41 @@ int getPixelValue(unsigned int x, unsigned int y, TexImage2D image, color * pixe
     {
         printf ("Error: %s %s %d", __FILE__, __func__, __LINE__);
     }
+	// printf("diff = %lu\n",(long int)(clkEnd_ - clkStart_));
+    timeGetPixelValue += clock() - clkStart_getPixelValue;
     return 0;
 }
 
 SECTION(TEXTURE_TRIANGLE_SECTION)
 float wrapCoord (NMGLint textureWrapMode, int texAxisSize, float texCoord)
 {
+	SET_START_TIME(timeWrapCoord)
+	
+	SET_START_TIME(timeWrapCoord_div)
 	float min_coord_val = 1 / (float)texAxisSize*0.5; //CLAMP_TO_EDGE
+	INCREASE_TIMECOUNTER(timeWrapCoord_div)
+	
+	SET_START_TIME(timeWrapCoord_calcMaxVal)
 	//float min_s = 0.0f; //CLAMP
 	float max_coord_val = 1.0f - min_coord_val;
 
 	float resTexCoord = 0.0f;
+	INCREASE_TIMECOUNTER(timeWrapCoord_calcMaxVal)
 
 	//Apply texture Wrap modes
 	if (textureWrapMode == NMGL_REPEAT)
+	{
+		SET_START_TIME(timeWrapCoord_repeat)
 		resTexCoord = texCoord - floor(texCoord);
+		INCREASE_TIMECOUNTER(timeWrapCoord_repeat)
+	}
 	else if (textureWrapMode == NMGL_CLAMP_TO_EDGE)
 	{
+		SET_START_TIME(timeWrapCoord_clamp)
 		if (texCoord > max_coord_val) resTexCoord = max_coord_val;
 		else if (texCoord < min_coord_val) resTexCoord = min_coord_val;
 		else resTexCoord = texCoord;
+		INCREASE_TIMECOUNTER(timeWrapCoord_clamp)
 	}
 	else
 	{
@@ -273,14 +363,14 @@ float wrapCoord (NMGLint textureWrapMode, int texAxisSize, float texCoord)
 		getchar();
 		return -1.0;
 	}
-
+	INCREASE_TIMECOUNTER(timeWrapCoord)
 	return resTexCoord;
 }
 
 SECTION(TEXTURE_TRIANGLE_SECTION)   
 color getPixelLinear(Vec2f st, NMGLint textureWrapS, NMGLint textureWrapT, TexImage2D texture)
 {
-
+	clkStart_getPixelLinear = clock();
 	unsigned int i0 = 0;
 	unsigned int j0 = 0;
 	unsigned int i1 = 0;
@@ -290,8 +380,10 @@ color getPixelLinear(Vec2f st, NMGLint textureWrapS, NMGLint textureWrapT, TexIm
 	float u = texture.width*st.x; //2^n = textureWidth
 	float v = texture.height*st.y; //2^m = textureHeight
 	
+	clkStart_timeGetPixelLinear_floor = clock();
 	float u_floor = floor(u - 0.5f);
 	float v_floor = floor(v - 0.5f);
+	timeGetPixelLinear_floor += (unsigned int)(clock() - clkStart_timeGetPixelLinear_floor);
 
 	if (textureWrapS == NMGL_REPEAT)
 		i0 = fmod(u_floor, texture.width);
@@ -316,15 +408,18 @@ color getPixelLinear(Vec2f st, NMGLint textureWrapS, NMGLint textureWrapT, TexIm
 	else
 		j1 = j0plus1;
 
+	clkStart_timeGetPixelLinear_modf = clock();
 	double intpart = 0.0;
 	float alpha = modf(u - 0.5, &intpart);
 	float beta = modf(v - 0.5, &intpart);
+	timeGetPixelLinear_modf += (unsigned int)(clock() - clkStart_timeGetPixelLinear_modf);
 
 	color pixel_i0j0;
 	color pixel_i1j0;
 	color pixel_i0j1;
 	color pixel_i1j1;
 
+	clkStart_timeGetPixelLinear_getPixel = clock();
 	if ((i0 < 0) || (i0 >= texture.width) || (j0 < 0) || (j0 >= texture.height))
 	{
 		pixel_i0j0 = borderColor;
@@ -361,7 +456,9 @@ color getPixelLinear(Vec2f st, NMGLint textureWrapS, NMGLint textureWrapT, TexIm
 	{
 		getPixelValue(i1, j1, texture, &pixel_i1j1);
 	}
+	timeGetPixelLinear_getPixel += (unsigned int) (clock() - clkStart_timeGetPixelLinear_getPixel);
 
+	clkStart_interpolatePixels = clock();
 	float one_a_one_b = (1 - alpha)*(1 - beta);
 	float a_one_b = alpha*(1 - beta);
 	float one_a_b = (1 - alpha)*beta;
@@ -371,14 +468,16 @@ color getPixelLinear(Vec2f st, NMGLint textureWrapS, NMGLint textureWrapT, TexIm
 	pixelValue.g = one_a_one_b*pixel_i0j0.g + a_one_b*pixel_i1j0.g + one_a_b*pixel_i0j1.g + a_b*pixel_i1j1.g;
 	pixelValue.b = one_a_one_b*pixel_i0j0.b + a_one_b*pixel_i1j0.b + one_a_b*pixel_i0j1.b + a_b*pixel_i1j1.b;
 	pixelValue.a = one_a_one_b*pixel_i0j0.a + a_one_b*pixel_i1j0.a + one_a_b*pixel_i0j1.a + a_b*pixel_i1j1.a;
+	timeGetPixelLinear_interpolatePixels += (unsigned int) (clock() - clkStart_interpolatePixels);
 
+	timeGetPixelLinear += (unsigned int)(clock() - clkStart_getPixelLinear);
 	return pixelValue;//TODO return by pointer
 }
 
 SECTION(TEXTURE_TRIANGLE_SECTION)
 color getPixelNearest(Vec2f st, TexImage2D texture)
 {
-
+	clkStart_getPixelNearest = clock();
 	unsigned int texel_i = 0;
 	unsigned int texel_j = 0;
 	color pixelValue;
@@ -391,6 +490,7 @@ color getPixelNearest(Vec2f st, TexImage2D texture)
 	texel_j = st.y < 1 ? floor(v) : texture.height - 1;
 	getPixelValue(texel_i, texel_j, texture, &pixelValue);
 
+	timeGetPixelNearest += (unsigned int)(clock() - clkStart_getPixelNearest);
 	return pixelValue;//TODO return by pointer
 
 }
@@ -497,7 +597,8 @@ void textureTriangle(TrianglesInfo* triangles, nm32s* pDstTriangle, int count)
 		unsigned int primHeight = maxY - winY0 + 1;
 		unsigned int primWidth = maxX - winX0 + 1;
 		
-#ifdef PERSPECTIVE_CORRECT        
+#ifdef PERSPECTIVE_CORRECT     
+		clkStart_timePerspectiveCorrect = clock();
 		// Compute some coefficients.
 		// Used for:
 		// * something similar to linear-rational interpolation 
@@ -530,6 +631,7 @@ void textureTriangle(TrianglesInfo* triangles, nm32s* pDstTriangle, int count)
 		float A1_t = A2_12*t0 + A2_02*t1 + A2_10*t2;
 		float B1_t = B2_12*t0 + B2_02*t1 + B2_10*t2;
 		float D1_t = D2_12*t0 + D2_02*t1 + D2_10*t2;
+		timePerspectiveCorrect += (unsigned int)(clock() - clkStart_timePerspectiveCorrect);
         
 		/*****************************************************************/
 #else //PERSPECTIVE_CORRECT
@@ -556,24 +658,6 @@ void textureTriangle(TrianglesInfo* triangles, nm32s* pDstTriangle, int count)
 
 #endif //PERSPECTIVE_CORRECT
 
-#ifdef PERSPECTIVE_CORRECT
-		//Precompute reciprocal of vertex z-coordinate.
-		//Part of calculation perspective correct attribute values using barycentric coordinates.
-		z0 = 1 / z0;
-		z1 = 1 / z1;
-		z2 = 1 / z2;
-
-		// Prepare vertex attributes. Divde them biy their vertex z-coordinate
-		// (though we use a multiplication here because v.z = 1 / v.z)
-		//Part of calculation of perspective correct attribute values using barycentric coordinates.
-        s0 *= z0;
-        s1 *= z1;
-        s2 *= z2;
-        t0 *= z0;
-        t1 *= z1;
-        t2 *= z2;
-#endif //PERSPECTIVE_CORRECT
-        
 		nmblas_scopy(primWidth, initVecx, 1, vecxf, 1);
 		nmblas_scopy(primWidth, initVecy, 1, vecyf, 1);
 		nmppsAddC_32f(vecxf, vecxf, winX0, primWidth);
@@ -584,10 +668,13 @@ void textureTriangle(TrianglesInfo* triangles, nm32s* pDstTriangle, int count)
             nm32s* pDst = (nm32s*)(dstTriagle + y * WIDTH_PTRN);
             
 #ifdef PERSPECTIVE_CORRECT
+			clkStart_timePerspectiveCorrect = clock();
 			//float oneOverDenominator = 1 / (A2*xf + B2*yf + D2);
 			nmppsMulC_AddC_32f(vecyf, B2, D2, buf0, primWidth);
 			nmppsMulC_AddV_32f(vecxf, buf0, buf0, A2, primWidth);
+			clkStart_timePerspectiveCorrect_div = clock();
 			nmppsDiv_32f(ones, buf0, oneOverDenominator, primWidth);
+			timePerspectiveCorrect_div += (unsigned int)(clock() - clkStart_timePerspectiveCorrect_div);
 			
 			//float s = (A1_s*xf + B1_s*yf + D1_s) * oneOverDenominator;
 			nmppsMulC_AddC_32f(vecyf, B1_s, D1_s, buf0, primWidth);
@@ -598,6 +685,7 @@ void textureTriangle(TrianglesInfo* triangles, nm32s* pDstTriangle, int count)
 			nmppsMulC_AddC_32f(vecyf, B1_t, D1_t, buf0, primWidth);
 			nmppsMulC_AddV_32f(vecxf, buf0, vect, A1_t, primWidth);
 			nmppsMul_AddC_32f(vect, oneOverDenominator, 0.0, vect, primWidth);
+			timePerspectiveCorrect += (unsigned int)(clock() - clkStart_timePerspectiveCorrect);
 #else //PERSPECTIVE_CORRECT                    
 			//s = A_s*xf + B_s*yf + D_s;
 			nmppsMulC_AddC_32f(vecyf, B_s, D_s, buf0, primWidth);
@@ -620,12 +708,15 @@ void textureTriangle(TrianglesInfo* triangles, nm32s* pDstTriangle, int count)
 /*Calculate partial derivative for u(x,y) and v(x,y). level 0 texture are using to calculate scale factor*/
 
 #ifdef PERSPECTIVE_CORRECT
+			clkStart_timePerspectiveCorrect = clock();
 			//float derivOneOverDenom = 1.0 / ((A2*x + B2*y + D2)*(A2*x + B2*y + D2));//TODO: may be xf, yf should be used
 			nmppsSubC_32f(vecyf, vecy, 0.5, primWidth);
 			nmppsMulC_AddC_32f(vecy, B2, D2, buf0, primWidth);
 			nmppsMulC_AddV_32f(vecx, buf0, buf0, A2, primWidth);
 			nmppsMul_AddC_32f(buf0, buf0, 0.0, buf0, primWidth);
+			clkStart_timePerspectiveCorrect_div = clock();
 			nmppsDiv_32f(ones, buf0, derivOneOverDenom, primWidth);
+			timePerspectiveCorrect_div += (unsigned int)(clock() - clkStart_timePerspectiveCorrect_div);
 
 			float tmp0 = 0.0;
 			float tmp1 = 0.0;
@@ -657,7 +748,7 @@ void textureTriangle(TrianglesInfo* triangles, nm32s* pDstTriangle, int count)
 			nmppsMulC_AddC_32f(vecx, tmp0, tmp1, buf0, primWidth);
 			nmppsMul_AddC_32f(buf0, derivOneOverDenom, 0.0, buf0, primWidth);
 			nmppsMulC_AddC_32f(buf0, (float)boundTexObject->texImages2D[0].height, 0.0, vecdvdy, primWidth);					
-			
+			timePerspectiveCorrect += (unsigned int)(clock() - clkStart_timePerspectiveCorrect);
 #else //PERSPECTIVE_CORRECT  
 			//float dudx = (float)boundTexObject->texImages2D[0].width*A_s;
 			nmppsMulC_AddC_32f(ones, (float)boundTexObject->texImages2D[0].width*A_s, 0.0, vecdudx, primWidth);
@@ -698,11 +789,13 @@ void textureTriangle(TrianglesInfo* triangles, nm32s* pDstTriangle, int count)
 
 /*Calculate scale factor*/
 #ifdef SCALE_FACTOR_IDEAL
+				clkStart_timeSqrtf = clock();
 				float dudx = vecdudx[x];
 				float dudy = vecdudy[x];
 				float dvdx = vecdvdx[x];
 				float dvdy = vecdvdy[x];	
 				scaleFactor = fmax(sqrtf(dudx*dudx + dvdx*dvdx), sqrtf(dudy*dudy + dvdy*dvdy));
+				timeSqrtf += (unsigned int)(clock() - clkStart_timeSqrtf);
 #else //SCALE_FACTOR_IDEAL
 				scaleFactor = vecScaleFactor [x];
 #endif //SCALE_FACTOR_IDEAL				
@@ -710,7 +803,9 @@ void textureTriangle(TrianglesInfo* triangles, nm32s* pDstTriangle, int count)
 /*Calculate level of detail*/
 
 				float lod = 0.0;
+				clkStart_timeLog2f = clock();
 				float lod_ = log2f(scaleFactor);
+				timeLog2f += (unsigned int)(clock() - clkStart_timeLog2f);
 
 				if (NMGL_TEX_MIN_LOD > NMGL_TEX_MAX_LOD)
 				{
@@ -840,13 +935,21 @@ void textureTriangle(TrianglesInfo* triangles, nm32s* pDstTriangle, int count)
 						getchar();
 					}
 					
+					clkStart_timeInterpolateMipmap = clock();
+					
+					clkStart_timeInterpolateMipmap_modf = clock();
 					double intpart = 0.0;
 					float frac_lod = modf(lod, &intpart);
+					timeInterpolateMipmap_modf += (unsigned int)(clock() - clkStart_timeInterpolateMipmap_modf);
 
+					clkStart_timeInterpolateMipmap_interp = clock();
 					pixelValue.r = (1.0 - frac_lod)*t1.r + frac_lod*t2.r;
 					pixelValue.g = (1.0 - frac_lod)*t1.g + frac_lod*t2.g;
 					pixelValue.b = (1.0 - frac_lod)*t1.b + frac_lod*t2.b;
 					pixelValue.a = (1.0 - frac_lod)*t1.a + frac_lod*t2.a;
+					timeInterpolateMipmap_interp += (unsigned int)(clock() - clkStart_timeInterpolateMipmap_interp);
+					
+					timeInterpolateMipmap += (unsigned int)(clock() - clkStart_timeInterpolateMipmap);
 				}
 				else
 				{
@@ -892,7 +995,7 @@ void textureTriangle(TrianglesInfo* triangles, nm32s* pDstTriangle, int count)
 			ac = texEnvColorAlpha;
 						
 			//Apply texture function
-
+			clkStart_timeTexFunction = clock();
 			switch (texBaseInternalFormat)
 			{
 				case NMGL_RGB:
@@ -1259,7 +1362,9 @@ void textureTriangle(TrianglesInfo* triangles, nm32s* pDstTriangle, int count)
 					printf ("Unsupported internal format\n");
 					break;
 			}
-
+			timeTexFunction += (unsigned int)(clock() - clkStart_timeTexFunction);
+			
+			clkStart_timeBuildFbPixel = clock();
 			for(int x = 0; x < primWidth; x++){
 				Vec3f cv; //primary color components computed by the texture function (to another OpenGL stages or to next texture unit)
 				float av;
@@ -1277,6 +1382,7 @@ void textureTriangle(TrianglesInfo* triangles, nm32s* pDstTriangle, int count)
 				pDst[0] = color;
                 pDst += 1;
             }
+			timeBuildFbPixel += (unsigned int)(clock() - clkStart_timeBuildFbPixel);
             nmppsAddC_32f(vecyf, vecyf, 1.0, primWidth);
         }
     }

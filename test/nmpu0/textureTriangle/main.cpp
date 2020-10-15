@@ -27,6 +27,7 @@
 
 extern "C" TexImage2D teximage_256_256;
 extern "C" TexImage2D teximage_mytexture;
+extern "C" TexImage2D teximage_mytexture_256_256;
 extern "C" TexImage2D teximage_128_128;
 extern "C" TexImage2D teximage_64_64;
 extern "C" TexImage2D teximage_32_32;
@@ -159,6 +160,114 @@ template<class T> inline T* myMallocT(int count) {
 
 SECTION(".data_imu0") NMGL_Context_NM0 *NMGL_Context_NM0::context;
 
+unsigned int timeMod = 0;
+unsigned int timeModf = 0;
+unsigned int timeGetPixelValue = 0;
+unsigned int timeLog2f = 0;
+unsigned int timeDiv = 0;
+unsigned int timeFmod = 0;
+unsigned int timeMemAccess = 0;
+unsigned int timeGetPixelLinear = 0;
+unsigned int timeGetPixelNearest = 0;
+unsigned int timeGetPixelLinear_interpolatePixels = 0;
+unsigned int timeGetPixelLinear_floor = 0;
+unsigned int timeGetPixelLinear_modf = 0;
+unsigned int timeInterpolateMipmap = 0;
+unsigned int timeInterpolateMipmap_modf = 0;
+unsigned int timeInterpolateMipmap_interp = 0;
+unsigned int timePerspectiveCorrect = 0;
+unsigned int timePerspectiveCorrect_div = 0;
+unsigned int timeSqrtf = 0;
+unsigned int timeBuildFbPixel = 0;
+unsigned int timeTexFunction = 0;
+unsigned int timeGetPixelLinear_getPixel = 0;
+unsigned int timeWrapCoord = 0;
+unsigned int timeWrapCoord_div = 0;
+unsigned int timeWrapCoord_repeat = 0;
+unsigned int timeWrapCoord_clamp = 0;
+unsigned int timeWrapCoord_calcMaxVal = 0;
+
+
+void resetCounters() {
+	timeMod = 0;
+	timeModf = 0;
+	timeGetPixelValue = 0;
+	timeLog2f = 0;
+	timeDiv = 0;
+	timeFmod = 0;
+	timeMemAccess = 0;
+	timeGetPixelLinear = 0;
+	timeGetPixelNearest = 0;
+	timeGetPixelLinear_interpolatePixels = 0;
+	timeGetPixelLinear_floor = 0;
+	timeGetPixelLinear_modf = 0;
+	timeGetPixelLinear_getPixel = 0; 
+	timeInterpolateMipmap = 0;
+	timeInterpolateMipmap_modf = 0;
+	timeInterpolateMipmap_interp = 0;
+	timePerspectiveCorrect = 0;
+	timePerspectiveCorrect_div = 0;
+	timeSqrtf = 0;
+	timeTexFunction = 0;
+	timeBuildFbPixel = 0;
+	timeWrapCoord = 0;
+	timeWrapCoord_div = 0;
+	timeWrapCoord_repeat = 0;
+	timeWrapCoord_clamp = 0;
+	timeWrapCoord_calcMaxVal = 0;
+};
+
+void printCounters(unsigned int allTime) {
+	
+	printf("%u\t",(unsigned int)timeGetPixelValue); //timeGetPixelValue
+	printf("%u\t",(unsigned int)timeGetPixelNearest); //timeGetPixelNearest
+	printf("%u\t",(unsigned int)timeGetPixelLinear); //timeGetPixelLinear
+	printf("%u\t",(unsigned int)timeGetPixelLinear_interpolatePixels); //timeGetPixelLinear_interpolatePixels
+	printf("%u\t",(unsigned int)timeGetPixelLinear_floor); //timeGetPixelLinear_floor
+	printf("%u\t",(unsigned int)timeGetPixelLinear_modf); //timeGetPixelLinear_modf
+	printf("%u\t",(unsigned int)timeGetPixelLinear_getPixel); //timeGetPixelLinear_getPixel
+	printf("%u\t",(unsigned int)timeLog2f); //timeLog2f
+	printf("%u\t",(unsigned int)timeInterpolateMipmap); //timeInterpolateMipmap
+	printf("%u\t",(unsigned int)timeInterpolateMipmap_modf); //timeInterpolateMipmap_modf
+	printf("%u\t",(unsigned int)timeInterpolateMipmap_interp); //timeInterpolateMipmap_interp
+	printf("%u\t",(unsigned int)timePerspectiveCorrect); //timePerspectiveCorrect
+	printf("%u\t",(unsigned int)timePerspectiveCorrect_div); //timePerspectiveCorrect_div
+	printf("%u\t",(unsigned int)timeSqrtf); //timeSqrtf
+	printf("%u\t",(unsigned int)timeTexFunction); //timeTexFunction
+	printf("%u\t",(unsigned int)timeBuildFbPixel); //timeBuildFbPixel
+	printf("%u\t",(unsigned int)timeWrapCoord); //timeWrapCoord
+	printf("%u\t",(unsigned int)timeWrapCoord_div); //timeWrapCoord_div
+	printf("%u\t",(unsigned int)timeWrapCoord_repeat); //timeWrapCoord_repeat
+	printf("%u\t",(unsigned int)timeWrapCoord_clamp); //timeWrapCoord_clamp
+	printf("%u\t",(unsigned int)timeWrapCoord_calcMaxVal); //timeWrapCoord_calcMaxVal
+	printf("\n\n");
+	
+	printf("timeGetPixelValue/allTime = %f\n",(float)timeGetPixelValue/allTime*100.0f); //timeGetPixelValue
+	printf("timeGetPixelNearest/allTime = %f\n",(float)timeGetPixelNearest/allTime*100.0f); //timeGetPixelNearest
+	printf("timeGetPixelLinear/allTime = %f\n",(float)timeGetPixelLinear/allTime*100.0f); //timeGetPixelLinear
+	printf("timeGetPixelLinear_interpolatePixels/timeGetPixelLinear = %f\n",(float)timeGetPixelLinear_interpolatePixels/timeGetPixelLinear*100.0f); //timeGetPixelLinear_interpolatePixels
+	printf("timeGetPixelLinear_floor/timeGetPixelLinear = %f\n",(float)timeGetPixelLinear_floor/timeGetPixelLinear*100.0f); //timeGetPixelLinear_floor
+	printf("timeGetPixelLinear_modf/timeGetPixelLinear = %f\n",(float)timeGetPixelLinear_modf/timeGetPixelLinear*100.0f); //timeGetPixelLinear_modf
+	printf("timeGetPixelLinear_getPixel/timeGetPixelLinear = %f\n",(float)timeGetPixelLinear_getPixel/timeGetPixelLinear*100.0f); //timeGetPixelLinear_getPixel
+	printf("timeLog2f/allTime = %f\n",(float)timeLog2f/allTime*100.0f); //timeLog2f
+	printf("timeInterpolateMipmap/allTime = %f\n",(float)timeInterpolateMipmap/allTime*100.0f); //timeInterpolateMipmap
+	printf("timeInterpolateMipmap_modf/timeInterpolateMipmap = %f\n",(float)timeInterpolateMipmap_modf/timeInterpolateMipmap*100.0f); //timeInterpolateMipmap_modf
+	printf("timeInterpolateMipmap_interp/timeInterpolateMipmap = %f\n",(float)timeInterpolateMipmap_interp/timeInterpolateMipmap*100.0f); //timeInterpolateMipmap_interp
+	printf("timePerspectiveCorrect/allTime = %f\n",(float)timePerspectiveCorrect/allTime*100.0f); //timePerspectiveCorrect
+	printf("timePerspectiveCorrect_div/timePerspectiveCorrect = %f\n",(float)timePerspectiveCorrect_div/timePerspectiveCorrect*100.0f); //timePerspectiveCorrect_div
+	printf("timeSqrtf/allTime = %f\n",(float)timeSqrtf/allTime*100.0f); //timeSqrtf
+	printf("timeTexFunction/allTime = %f\n",(float)timeTexFunction/allTime*100.0f); //timeTexFunction
+	printf("timeBuildFbPixel/allTime = %f\n",(float)timeBuildFbPixel/allTime*100.0f); //timeBuildFbPixel
+	printf("timeWrapCoord/allTime = %f\n",(float)timeWrapCoord/allTime*100.0f); //timeWrapCoord
+	printf("timeWrapCoord/timeWrapCoord = %f\n",(float)timeWrapCoord/timeWrapCoord*100.0f); //timeWrapCoord
+	printf("timeWrapCoord_div/timeWrapCoord = %f\n",(float)timeWrapCoord_div/timeWrapCoord*100.0f); //timeWrapCoord_div
+	printf("timeWrapCoord_repeat/timeWrapCoord = %f\n",(float)timeWrapCoord_repeat/timeWrapCoord*100.0f); //timeWrapCoord_repeat
+	printf("timeWrapCoord_clamp/timeWrapCoord = %f\n",(float)timeWrapCoord_clamp/timeWrapCoord*100.0f); //timeWrapCoord_clamp
+	printf("timeWrapCoord_calcMaxVal/timeWrapCoord = %f\n",(float)timeWrapCoord_calcMaxVal/timeWrapCoord*100.0f); //timeWrapCoord_calcMaxVal
+	printf("\n\n");
+	
+};
+
 SECTION(".text_demo3d") 
 int main ()
 {
@@ -218,20 +327,36 @@ int main ()
      //float x2[TRIANGLE_AMOUNT] = {26.0f, 26.0f};
      //float y2[TRIANGLE_AMOUNT] = {5.0f, 5.0f};
    
-    float x0[TRIANGLE_AMOUNT] = {399.0f, 399.0f};
-    float y0[TRIANGLE_AMOUNT] = {354.0f, 354.0f};
-    float x1[TRIANGLE_AMOUNT] = {384.0f, 384.0f};
-    float y1[TRIANGLE_AMOUNT] = {374.0f, 374.0f};
-    float x2[TRIANGLE_AMOUNT] = {410.0f, 410.0f};
-    float y2[TRIANGLE_AMOUNT] = {379.0f, 379.0f};
+    //float x0[TRIANGLE_AMOUNT] = {399.0f, 399.0f};
+    //float y0[TRIANGLE_AMOUNT] = {354.0f, 354.0f};
+    //float x1[TRIANGLE_AMOUNT] = {384.0f, 384.0f};
+    //float y1[TRIANGLE_AMOUNT] = {374.0f, 374.0f};
+    //float x2[TRIANGLE_AMOUNT] = {410.0f, 410.0f};
+    //float y2[TRIANGLE_AMOUNT] = {379.0f, 379.0f};
+    //
+    //float s0[TRIANGLE_AMOUNT] = {0.0f, 0.0f};
+    //float t0[TRIANGLE_AMOUNT] = {0.0f, 0.0f};
+    //float s1[TRIANGLE_AMOUNT] = {0.5f, 0.5f};
+    //float t1[TRIANGLE_AMOUNT] = {0.5f, 0.5f};
+    //float s2[TRIANGLE_AMOUNT] = {0.5f, 0.5f};
+    //float t2[TRIANGLE_AMOUNT] = {0.0f, 0.0f};
+
+    float x0[TRIANGLE_AMOUNT] = {0.0f, 0.0f};
+    float y0[TRIANGLE_AMOUNT] = {0.0f, 0.0f};
+    float x1[TRIANGLE_AMOUNT] = {0.0f, 0.0f};
+    float y1[TRIANGLE_AMOUNT] = {31.0f, 31.0f};
+    float x2[TRIANGLE_AMOUNT] = {31.0f, 31.0f};
+    float y2[TRIANGLE_AMOUNT] = {31.0f, 31.0f};
     
     float s0[TRIANGLE_AMOUNT] = {0.0f, 0.0f};
-    float t0[TRIANGLE_AMOUNT] = {0.0f, 0.0f};
-    float s1[TRIANGLE_AMOUNT] = {0.5f, 0.5f};
-    float t1[TRIANGLE_AMOUNT] = {0.5f, 0.5f};
-    float s2[TRIANGLE_AMOUNT] = {0.5f, 0.5f};
+    float t0[TRIANGLE_AMOUNT] = {1.0f, 1.0f};
+    float s1[TRIANGLE_AMOUNT] = {0.0f, 0.0f};
+    float t1[TRIANGLE_AMOUNT] = {0.0f, 0.0f};
+    float s2[TRIANGLE_AMOUNT] = {1.0f, 1.0f};
     float t2[TRIANGLE_AMOUNT] = {0.0f, 0.0f};
 
+
+    
     float z[TRIANGLE_AMOUNT] = {1.0f, 1.0f}; //minus (z in camera space)
     
 	for (int counter = 0; counter < 1; counter++)
@@ -265,7 +390,8 @@ int main ()
 		test_cntxt->texState.texUnits[activeTexUnitIndex].boundTexObject = &test_cntxt->texState.texObjects[0];
 		TexObject* boundTexObject = test_cntxt->texState.texUnits[activeTexUnitIndex].boundTexObject;
 
-		boundTexObject->texImages2D[0] = teximage_mytexture;
+		//boundTexObject->texImages2D[0] = teximage_mytexture;
+		boundTexObject->texImages2D[0] = teximage_mytexture_256_256;
 		boundTexObject->texImages2D[1] = teximage_128_128;
 		boundTexObject->texImages2D[2] = teximage_64_64;
 		boundTexObject->texImages2D[3] = teximage_32_32;
@@ -282,51 +408,59 @@ int main ()
 		test_cntxt->texState.texUnits[activeTexUnitIndex].texEnvColor[3] = 0.0f;
 
 		boundTexObject->texMagFilter = NMGL_NEAREST; //default LINEAR
-		boundTexObject->texWrapS = NMGL_REPEAT; // default REPEAT
-		boundTexObject->texWrapT = NMGL_REPEAT;// default REPEAT
-		test_cntxt->texState.texUnits[activeTexUnitIndex].texFunctionName = NMGL_BLEND; //default = NMGL_MODULATE
+		boundTexObject->texWrapS = NMGL_CLAMP_TO_EDGE; // default REPEAT
+		boundTexObject->texWrapT = NMGL_CLAMP_TO_EDGE;// default REPEAT
+		test_cntxt->texState.texUnits[activeTexUnitIndex].texFunctionName = NMGL_REPLACE; //default = NMGL_MODULATE
 	
 //texMinFilter = NMGL_NEAREST
 		printf ("texMinFilter = NMGL_NEAREST\n");
+		resetCounters();
 		boundTexObject->texMinFilter = NMGL_NEAREST;
 
 		clkStart=clock();	
 		textureTriangle(&triangles, pDstTriangle, count);
 		clkEnd=clock();	
 		diff = clkEnd - clkStart;
-		printf("time = %lu\n",(long int)diff);
-
+		printf("time = %u\n",(unsigned int)diff);
+		printCounters(diff);
+#if 0
 //texMinFilter = NMGL_LINEAR
 		printf ("texMinFilter = NMGL_LINEAR\n");
+		resetCounters();
 		boundTexObject->texMinFilter = NMGL_LINEAR;
 
 		clkStart=clock();	
 		textureTriangle(&triangles, pDstTriangle, count);
 		clkEnd=clock();	
 		diff = clkEnd - clkStart;
-		printf("time = %lu\n",(long int)diff);	
+		printf("time = %u\n",(unsigned int)diff);
+		printCounters(diff);
 	
 //texMinFilter = NMGL_NEAREST_MIPMAP_LINEAR
 		printf ("texMinFilter = NMGL_NEAREST_MIPMAP_LINEAR\n");
+		resetCounters();
 		boundTexObject->texMinFilter = NMGL_NEAREST_MIPMAP_LINEAR;
 
 		clkStart=clock();	
 		textureTriangle(&triangles, pDstTriangle, count);
 		clkEnd=clock();	
 		diff = clkEnd - clkStart;
-		printf("time = %lu\n",(long int)diff);	
+		printf("time = %u\n",(unsigned int)diff);
+		printCounters(diff);
 	
 //texMinFilter = NMGL_LINEAR_MIPMAP_LINEAR
 		printf ("texMinFilter = NMGL_LINEAR_MIPMAP_LINEAR\n");
+		resetCounters();
 		boundTexObject->texMinFilter = NMGL_LINEAR_MIPMAP_LINEAR;
 
 		clkStart=clock();	
 		textureTriangle(&triangles, pDstTriangle, count);
 		clkEnd=clock();	
 		diff = clkEnd - clkStart;
-		printf("time = %lu\n",(long int)diff);		
+		printf("time = %u\n",(unsigned int)diff);
+		printCounters(diff);		
 		
-
+#endif
 		
 }
 	
