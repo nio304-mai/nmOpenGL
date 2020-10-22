@@ -70,52 +70,52 @@ int main(int argc, char **argv)
 {
     puts("VertexPrimitiveRepack tests: ");
     RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstVertexLengthIsCorrect);
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstVertexIsCorrect);
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstColorLengthIsCorrect);
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstColorIsCorrect);
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES81Triangles_dstVertexLengthIsCorrect);
-	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES81Triangles_dstVertexIsCorrect);
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES81_dstColorLengthIsCorrect);
-	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES81_dstColorIsCorrect);
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES90Triangles_dstVertexLengthIsCorrect);
-	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES90Triangles_dstVertexIsCorrect);
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES90_dstColorLengthIsCorrect);
-	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES90_dstColorIsCorrect);
-	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES15Vertexes_returns5);
-	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES45Vertexes_returns15);
-	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES90Vertexes_returns30);	
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstVertexIsCorrect);
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstColorLengthIsCorrect);
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstColorIsCorrect);
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES81Triangles_dstVertexLengthIsCorrect);
+	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES81Triangles_dstVertexIsCorrect);
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES81_dstColorLengthIsCorrect);
+	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES81_dstColorIsCorrect);
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES90Triangles_dstVertexLengthIsCorrect);
+	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES90Triangles_dstVertexIsCorrect);
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES90_dstColorLengthIsCorrect);
+	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES90_dstColorIsCorrect);
+	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES15Vertexes_returns5);
+	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES45Vertexes_returns15);
+	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES90Vertexes_returns30);	
 
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP_dstVertexLengthIsCorrect);
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP_dstVertexIsCorrect);
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP_dstColorLengthIsCorrect);
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP_dstColorIsCorrect);
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP81Triangles_dstVertexLengthIsCorrect);
-	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP81Triangles_dstVertexIsCorrect);
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP81_dstColorLengthIsCorrect);
-	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP81_dstColorIsCorrect);
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP90Triangles_dstVertexLengthIsCorrect);
-	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP90Triangles_dstVertexIsCorrect);
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP90_dstColorLengthIsCorrect);
-	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP90_dstColorIsCorrect);
-	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP17Vertexes_returns15);
-	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP47Vertexes_returns45);
-	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP92Vertexes_returns90);	
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP_dstVertexLengthIsCorrect);
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP_dstVertexIsCorrect);
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP_dstColorLengthIsCorrect);
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP_dstColorIsCorrect);
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP81Triangles_dstVertexLengthIsCorrect);
+	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP81Triangles_dstVertexIsCorrect);
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP81_dstColorLengthIsCorrect);
+	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP81_dstColorIsCorrect);
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP90Triangles_dstVertexLengthIsCorrect);
+	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP90Triangles_dstVertexIsCorrect);
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP90_dstColorLengthIsCorrect);
+	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP90_dstColorIsCorrect);
+	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP17Vertexes_returns15);
+	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP47Vertexes_returns45);
+	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP92Vertexes_returns90);	
 
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN_dstVertexLengthIsCorrect);
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN_dstVertexIsCorrect);
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN_dstColorLengthIsCorrect);
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN_dstColorIsCorrect);
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN81Triangles_dstVertexLengthIsCorrect);
-	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN81Triangles_dstVertexIsCorrect);
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN81_dstColorLengthIsCorrect);
-	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN81_dstColorIsCorrect);
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN90Triangles_dstVertexLengthIsCorrect);
-	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN90Triangles_dstVertexIsCorrect);
-    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN90_dstColorLengthIsCorrect);
-	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN90_dstColorIsCorrect);
-	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN15Vertexes_returns13);
-	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN45Vertexes_returns43);
-	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN90Vertexes_returns88);	
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN_dstVertexLengthIsCorrect);
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN_dstVertexIsCorrect);
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN_dstColorLengthIsCorrect);
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN_dstColorIsCorrect);
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN81Triangles_dstVertexLengthIsCorrect);
+	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN81Triangles_dstVertexIsCorrect);
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN81_dstColorLengthIsCorrect);
+	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN81_dstColorIsCorrect);
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN90Triangles_dstVertexLengthIsCorrect);
+	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN90Triangles_dstVertexIsCorrect);
+    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN90_dstColorLengthIsCorrect);
+	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN90_dstColorIsCorrect);
+	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN15Vertexes_returns13);
+	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN45Vertexes_returns43);
+	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_FAN90Vertexes_returns88);	
 
 	puts("");
     puts("Performance tests: ");
@@ -137,27 +137,46 @@ int main(int argc, char **argv)
 int vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstVertexLengthIsCorrect()
 {
 	// Arrange
-    v4nm32f     srcVertex[9] = {0};
-    v4nm32f     srcColor[9] = {0};
-    nm32f       dstVertex[48] = {0} ;
-    v4nm32f     dstColor[12] = {0};
-
     int mode = NMGL_TRIANGLES;
-    int vertCount = 9;
+    constexpr int vertCount = 9;
+	constexpr int nOfTriangles = vertCount / 3;
+	constexpr int expectedNOfTriangles = nOfTriangles + nOfTriangles % 2;
+
+	constexpr int coordsPerTriangle = 12;	// nm32s coords
+	constexpr int colorsPerTriangle = 3;	// v4nm32f colors
+
+    v4nm32f     srcVertex[vertCount] = {0};
+    v4nm32f     srcColor[vertCount] = {0};
+    nm32f       dstVertex[coordsPerTriangle * (expectedNOfTriangles + 1)] = {0};
+    v4nm32f     dstColor[colorsPerTriangle * (expectedNOfTriangles + 1) ] = {0};
 
     for (int i = 0; i < vertCount; i++)
         for (int j = 0; j < 4; j++)
             srcVertex[i].vec[j] = 1;
 
-    nm32f expectedDstVertex[48]  = {0};
-    for (int i = 0; i < 36; i++)
+    nm32f expectedDstVertex[coordsPerTriangle * (expectedNOfTriangles + 1)]  = {0};
+    for (int i = 0; i < coordsPerTriangle * expectedNOfTriangles; i++)
         expectedDstVertex[i] = 1;
 	
 	// Act
     vertexPrimitiveRepack(srcVertex, srcColor,dstVertex, dstColor, mode, vertCount);
+
+	for (int i = 0; i < 12; ++i){
+		for (int j = 0; j < expectedNOfTriangles; ++j){
+			printf("%f ", expectedDstVertex[expectedNOfTriangles * i + j]);
+		}
+		puts("");
+	}
+	puts("");
+	for (int i = 0; i < 12; ++i){
+		for (int j = 0; j < expectedNOfTriangles; ++j){
+			printf("%f ", dstVertex[expectedNOfTriangles * i + j]);
+		}
+		puts("");
+	}
   
 	// Assert
-    TEST_ARRAYS_EQUAL (dstVertex, expectedDstVertex, 48);
+    TEST_ARRAYS_EQUAL (dstVertex, expectedDstVertex, coordsPerTriangle * expectedNOfTriangles);
     
     return 0;
 }

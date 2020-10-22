@@ -135,10 +135,10 @@ macro extractPair(coordAddr1, coordAddr2, delta)
 	fpu 0 .matrix vreg2 = vreg4 * .trans (vreg0, vreg1);
 	// Check if number of triangles is odd
 	// If it is then ar4 is odd and copy y and w coordinates through the buf
-	gr7 = gr1;
-	gr3 = 1;
-	gr7 = gr7 and gr3;
-	if > goto indirectCopy; 
+//	gr7 = gr1;
+//	gr3 = 1;
+//	gr7 = gr7 and gr3;
+//	if > goto indirectCopy; 
 	fpu 0 rep vlen [ar4++] = vreg2;	// else copy directly from the vreg
 	goto endLoop;
 <indirectCopy>
@@ -205,6 +205,10 @@ begin ".text_demo3d"			// начало секции кода
 	push gr6;
 	push gr0;
 	gr1 = gr7;
+	// Round gr1 to nearest even
+	gr1 = gr1 + 1;
+	gr1 >>= 1;
+	gr1 <<= 1;
 	//gr0 = 3;				
 	//IDIV32(gr1, gr6, gr0);	// gr1 - res, gr6 - division, gr0 - divider
 							// This macro modifies ar5 and gr7
@@ -241,6 +245,16 @@ begin ".text_demo3d"			// начало секции кода
 	ar2 = ar4 with gr2 = gr1;
 	ar4 = ar2 + gr2;	// Start address of W coordinates
 	extractPair(ar0 + 10, ar0 + 22, 24);
+
+	ar4 = [ar7 - 5] with gr4 = gr1 - 1;
+	ar4 = ar4 + gr4;
+	//ar2 = ar4 - 1;
+	//gr2 = gr1;
+	//gr4 = gr1;
+	
+	//gr3 = [ar2++gr2];
+	gr3 = 5;
+	[ar4] = gr3;
 
 	// Extract colors
 	// In case of GL_TRIANGLES the number of output colors is equal to the
