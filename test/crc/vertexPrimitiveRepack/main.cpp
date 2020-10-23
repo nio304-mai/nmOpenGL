@@ -22,7 +22,7 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES90Triangles_dstVertexLengthIsCorrect
 int vertexPrimitiveRepack_modeIsGL_TRIANGLES90Triangles_dstVertexIsCorrect();
 int vertexPrimitiveRepack_modeIsGL_TRIANGLES90_dstColorLengthIsCorrect ();
 int vertexPrimitiveRepack_modeIsGL_TRIANGLES90_dstColorIsCorrect();
-int vertexPrimitiveRepack_modeIsGL_TRIANGLES15Vertexes_returns5();
+int vertexPrimitiveRepack_modeIsGL_TRIANGLES15Vertexes_returns6();
 int vertexPrimitiveRepack_modeIsGL_TRIANGLES45Vertexes_returns15();
 int vertexPrimitiveRepack_modeIsGL_TRIANGLES90Vertexes_returns30();
 
@@ -70,22 +70,22 @@ int main(int argc, char **argv)
 {
     puts("VertexPrimitiveRepack tests: ");
     RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstVertexLengthIsCorrect);
-    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstVertexIsCorrect);
-    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstColorLengthIsCorrect);
-    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstColorIsCorrect);
-    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES81Triangles_dstVertexLengthIsCorrect);
-	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES81Triangles_dstVertexIsCorrect);
-    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES81_dstColorLengthIsCorrect);
-	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES81_dstColorIsCorrect);
+    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstVertexIsCorrect);
+    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstColorLengthIsCorrect);
+    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstColorIsCorrect);
+    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES81Triangles_dstVertexLengthIsCorrect);
+	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES81Triangles_dstVertexIsCorrect);
+    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES81_dstColorLengthIsCorrect);
+	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES81_dstColorIsCorrect);
     //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES90Triangles_dstVertexLengthIsCorrect);
 	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES90Triangles_dstVertexIsCorrect);
     //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES90_dstColorLengthIsCorrect);
 	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES90_dstColorIsCorrect);
-	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES15Vertexes_returns5);
+	RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES15Vertexes_returns6);
 	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES45Vertexes_returns15);
 	//RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES90Vertexes_returns30);	
 
-    //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP_dstVertexLengthIsCorrect);
+    RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP_dstVertexLengthIsCorrect);
     //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP_dstVertexIsCorrect);
     //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP_dstColorLengthIsCorrect);
     //RUN_TEST(vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP_dstColorIsCorrect);
@@ -140,43 +140,43 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstVertexLengthIsCorrect()
     int mode = NMGL_TRIANGLES;
     constexpr int vertCount = 9;
 	constexpr int nOfTriangles = vertCount / 3;
-	constexpr int expectedNOfTriangles = nOfTriangles + nOfTriangles % 2;
+	constexpr int expectedTrianglesCount = nOfTriangles + nOfTriangles % 2;
 
 	constexpr int coordsPerTriangle = 12;	// nm32s coords
 	constexpr int colorsPerTriangle = 3;	// v4nm32f colors
 
     v4nm32f     srcVertex[vertCount] = {0};
     v4nm32f     srcColor[vertCount] = {0};
-    nm32f       dstVertex[coordsPerTriangle * (expectedNOfTriangles + 1)] = {0};
-    v4nm32f     dstColor[colorsPerTriangle * (expectedNOfTriangles + 1) ] = {0};
+    nm32f       dstVertex[coordsPerTriangle * (expectedTrianglesCount + 1)] = {0};
+    v4nm32f     dstColor[colorsPerTriangle * (expectedTrianglesCount + 1) ] = {0};
 
     for (int i = 0; i < vertCount; i++)
         for (int j = 0; j < 4; j++)
             srcVertex[i].vec[j] = 1;
 
-    nm32f expectedDstVertex[coordsPerTriangle * (expectedNOfTriangles + 1)]  = {0};
-    for (int i = 0; i < coordsPerTriangle * expectedNOfTriangles; i++)
+    nm32f expectedDstVertex[coordsPerTriangle * (expectedTrianglesCount + 1)]  = {0};
+    for (int i = 0; i < coordsPerTriangle * expectedTrianglesCount; i++)
         expectedDstVertex[i] = 1;
 	
 	// Act
     vertexPrimitiveRepack(srcVertex, srcColor,dstVertex, dstColor, mode, vertCount);
 
 	for (int i = 0; i < 12; ++i){
-		for (int j = 0; j < expectedNOfTriangles; ++j){
-			printf("%f ", expectedDstVertex[expectedNOfTriangles * i + j]);
+		for (int j = 0; j < expectedTrianglesCount; ++j){
+			printf("%f ", expectedDstVertex[expectedTrianglesCount * i + j]);
 		}
 		puts("");
 	}
 	puts("");
 	for (int i = 0; i < 12; ++i){
-		for (int j = 0; j < expectedNOfTriangles; ++j){
-			printf("%f ", dstVertex[expectedNOfTriangles * i + j]);
+		for (int j = 0; j < expectedTrianglesCount; ++j){
+			printf("%f ", dstVertex[expectedTrianglesCount * i + j]);
 		}
 		puts("");
 	}
   
 	// Assert
-    TEST_ARRAYS_EQUAL (dstVertex, expectedDstVertex, coordsPerTriangle * expectedNOfTriangles);
+    TEST_ARRAYS_EQUAL (dstVertex, expectedDstVertex, coordsPerTriangle * expectedTrianglesCount);
     
     return 0;
 }
@@ -202,23 +202,36 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstVertexIsCorrect ()
 	int mode = NMGL_TRIANGLES;
 	int vertCount = 9;
 	
-	nm32f expectedDstVertex[36] =	{
-	  	  								1,2,3,
-	  									1,1,1,
-	  									1,2,1,
-	  									0,1,0,
-	  									2,2,2,
-	  									3,3,3,
-	  									2,1,1,
-	  									1,0,1,
-	  									2,3,3,
-	  									1,1,3,
-	  									1,2,2,
-	  									0,1,0
+	nm32f expectedDstVertex[48] =	{
+	  	  								1,2,3,3,
+	  									1,1,1,1,
+	  									1,2,1,1,
+	  									0,1,0,0,
+	  									2,2,2,2,
+	  									3,3,3,3,
+	  									2,1,1,1,
+	  									1,0,1,1,
+	  									2,3,3,3,
+	  									1,1,3,3,
+	  									1,2,2,2,
+	  									0,1,0,0,
 									};
 	
 	// Act
 	vertexPrimitiveRepack(srcVertex, srcColor,dstVertex, dstColor, mode, vertCount);
+	for (int i = 0; i < 12; ++i){
+		for (int j = 0; j < 4; ++j){
+			printf("%f ", expectedDstVertex[4 * i + j]);
+		}
+		puts("");
+	}
+	puts("");
+	for (int i = 0; i < 12; ++i){
+		for (int j = 0; j < 4; ++j){
+			printf("%f ", dstVertex[4 * i + j]);
+		}
+		puts("");
+	}
 	
 	// Assert
 	TEST_ARRAYS_EQUAL (dstVertex, expectedDstVertex, 36);
@@ -231,12 +244,12 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstColorLengthIsCorrect ()
 	// Arrange
 	constexpr int trianglesCount = 3;							// number of output triangles
     constexpr int vertCount = trianglesCount * 3;				// number of input vertexes
-	constexpr int outputCoordCount = 4 * 3 * trianglesCount;	// number of output vertexes
+	constexpr int outputCoordCount = 4 * 3 * (trianglesCount + trianglesCount % 2);	// number of output vertexes
 
     v4nm32f     srcVertex[vertCount] = {0};
     v4nm32f     srcColor[vertCount] = {0};
     nm32f       dstVertex[outputCoordCount] = {0};	
-    v4nm32f     dstColor[3 * (trianglesCount + 1)] = {0};	// one more triangle filled with zeroes
+    v4nm32f     dstColor[3 * (trianglesCount + trianglesCount % 2 + 1)] = {0};	// one more triangle filled with zeroes
 
     int mode = NMGL_TRIANGLES;
 
@@ -244,9 +257,9 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstColorLengthIsCorrect ()
         for (int j = 0; j < 4; j++)
             srcColor[i].vec[j] = 1;
 
-    v4nm32f expectedDstColor[3 * (trianglesCount + 1)] = {0};
+    v4nm32f expectedDstColor[3 * (trianglesCount + trianglesCount % 2 + 1)] = {0};
 
-    for (int i = 0; i < 3 * trianglesCount; i++){
+    for (int i = 0; i < 3 * (trianglesCount + trianglesCount % 2); i++){
         for (int j = 0; j < 4; j++){
             expectedDstColor[i].vec[j] = 1;
 		}
@@ -256,7 +269,7 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstColorLengthIsCorrect ()
     vertexPrimitiveRepack(srcVertex, srcColor,dstVertex, dstColor, mode, vertCount);
     
 	// Assert
-    TEST_VEC_ARRAYS_EQUAL (dstColor, expectedDstColor, 3 * (trianglesCount + 1));
+    TEST_VEC_ARRAYS_EQUAL (dstColor, expectedDstColor, 3 * (trianglesCount + trianglesCount % 2 + 1));
 
     return 0;
 }
@@ -266,7 +279,7 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstColorIsCorrect ()
 	// Arrange
 	constexpr int trianglesCount = 3;							// number of output triangles
     constexpr int vertCount = trianglesCount * 3;				// number of input vertexes
-	constexpr int outputCoordCount = 4 * 3 * trianglesCount;	// number of output vertexes
+	constexpr int outputCoordCount = 4 * 3 * (trianglesCount + trianglesCount % 2);	// number of output vertexes
 
     v4nm32f     srcVertex[vertCount] = {0};
     v4nm32f     srcColor[vertCount] =	{
@@ -281,8 +294,8 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstColorIsCorrect ()
 										{9,9,9,9}
 										};
     nm32f       dstVertex[outputCoordCount] = {0};	
-    v4nm32f     dstColor[3 * trianglesCount] = {0};	
-    v4nm32f expectedDstColor[3 * trianglesCount] =	{
+    v4nm32f     dstColor[3 * (trianglesCount + trianglesCount % 2)] = {0};	
+    v4nm32f expectedDstColor[3 * (trianglesCount + trianglesCount % 2)] =	{
 													{1,1,1,1},
 													{2,2,2,2},
 													{3,3,3,3},
@@ -291,7 +304,10 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstColorIsCorrect ()
 													{6,6,6,6},
 													{7,7,7,7},
 													{8,8,8,8},
-													{9,9,9,9}
+													{9,9,9,9},
+													{7,7,7,7},
+													{8,8,8,8},
+													{9,9,9,9},
 													};
     int mode = NMGL_TRIANGLES;
 
@@ -299,7 +315,7 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES_dstColorIsCorrect ()
     vertexPrimitiveRepack(srcVertex, srcColor,dstVertex, dstColor, mode, vertCount);
     
 	// Assert
-    TEST_VEC_ARRAYS_EQUAL (dstColor, expectedDstColor, 3 * trianglesCount);
+    TEST_VEC_ARRAYS_EQUAL (dstColor, expectedDstColor, 3 * (trianglesCount + trianglesCount % 2));
 
     return 0;
 }
@@ -308,13 +324,14 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES81Triangles_dstVertexLengthIsCorrect
 {
 	// Arrange
 	constexpr int trianglesCount = 81;							// number of output triangles
+	constexpr int expectedTrianglesCount = trianglesCount + trianglesCount % 2;
     constexpr int vertCount = trianglesCount * 3;				// number of input vertexes
-	constexpr int outputCoordCount = 4 * 3 * trianglesCount;	// number of output vertexes
+	constexpr int outputCoordCount = 4 * 3 * expectedTrianglesCount;	// number of output vertexes
 
     v4nm32f     srcVertex[vertCount] = {0};
     v4nm32f     srcColor[vertCount] = {0};
-    nm32f       dstVertex[outputCoordCount + trianglesCount] = {0};	// one more row filled with zeroes
-    v4nm32f     dstColor[3 * trianglesCount] = {0};
+    nm32f       dstVertex[outputCoordCount + expectedTrianglesCount] = {0};	// one more row filled with zeroes
+    v4nm32f     dstColor[3 * expectedTrianglesCount] = {0};
 
     int mode = NMGL_TRIANGLES;
 
@@ -322,7 +339,7 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES81Triangles_dstVertexLengthIsCorrect
         for (int j = 0; j < 4; j++)
             srcVertex[i].vec[j] = 1;
 
-    nm32f expectedDstVertex[outputCoordCount + trianglesCount]  = {0};
+    nm32f expectedDstVertex[outputCoordCount + expectedTrianglesCount]  = {0};
     for (int i = 0; i < outputCoordCount; i++){
         expectedDstVertex[i] = 1;
 	}
@@ -331,7 +348,7 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES81Triangles_dstVertexLengthIsCorrect
     vertexPrimitiveRepack(srcVertex, srcColor,dstVertex, dstColor, mode, vertCount);
 
 	// Assert
-    TEST_ARRAYS_EQUAL (dstVertex, expectedDstVertex, outputCoordCount + trianglesCount);
+    TEST_ARRAYS_EQUAL (dstVertex, expectedDstVertex, outputCoordCount + expectedTrianglesCount);
 
     return 0;
 }
@@ -340,13 +357,14 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES81Triangles_dstVertexIsCorrect()
 {
 	// Arrange
 	constexpr int trianglesCount = 81;							// number of output triangles
+	constexpr int expectedTrianglesCount = trianglesCount + trianglesCount % 2;
     constexpr int vertCount = trianglesCount * 3;				// number of input vertexes
-	constexpr int outputCoordCount = 4 * 3 * trianglesCount;	// number of output vertexes
+	constexpr int outputCoordCount = 4 * 3 * expectedTrianglesCount;	// number of output vertexes
 
     v4nm32f     srcVertex[vertCount] = {0};
     v4nm32f     srcColor[vertCount] = {0};
-    nm32f       dstVertex[outputCoordCount + trianglesCount] = {0};	// one more row filled with zeroes
-    v4nm32f     dstColor[3 * trianglesCount] = {0};
+    nm32f       dstVertex[outputCoordCount + expectedTrianglesCount] = {0};	// one more row filled with zeroes
+    v4nm32f     dstColor[3 * expectedTrianglesCount] = {0};
 
     int mode = NMGL_TRIANGLES;
 
@@ -354,27 +372,43 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES81Triangles_dstVertexIsCorrect()
         for (int j = 0; j < 4; j++)
             srcVertex[i].vec[j] = (float)(4 * i + j);
 
-    nm32f expectedDstVertex[outputCoordCount + trianglesCount]  = {0};
+    nm32f expectedDstVertex[outputCoordCount + expectedTrianglesCount]  = {0};
     for (int i = 0; i < trianglesCount; i++){
-		expectedDstVertex[ 0 * trianglesCount + i] = srcVertex[3 * i].vec[0];
-		expectedDstVertex[ 1 * trianglesCount + i] = srcVertex[3 * i].vec[1];
-		expectedDstVertex[ 2 * trianglesCount + i] = srcVertex[3 * i].vec[2];
-		expectedDstVertex[ 3 * trianglesCount + i] = srcVertex[3 * i].vec[3];
-		expectedDstVertex[ 4 * trianglesCount + i] = srcVertex[3 * i + 1].vec[0];
-		expectedDstVertex[ 5 * trianglesCount + i] = srcVertex[3 * i + 1].vec[1];
-		expectedDstVertex[ 6 * trianglesCount + i] = srcVertex[3 * i + 1].vec[2];
-		expectedDstVertex[ 7 * trianglesCount + i] = srcVertex[3 * i + 1].vec[3];
-		expectedDstVertex[ 8 * trianglesCount + i] = srcVertex[3 * i + 2].vec[0];
-		expectedDstVertex[ 9 * trianglesCount + i] = srcVertex[3 * i + 2].vec[1];
-		expectedDstVertex[10 * trianglesCount + i] = srcVertex[3 * i + 2].vec[2];
-		expectedDstVertex[11 * trianglesCount + i] = srcVertex[3 * i + 2].vec[3];
+		expectedDstVertex[ 0 * expectedTrianglesCount + i] = srcVertex[3 * i].vec[0];
+		expectedDstVertex[ 1 * expectedTrianglesCount + i] = srcVertex[3 * i].vec[1];
+		expectedDstVertex[ 2 * expectedTrianglesCount + i] = srcVertex[3 * i].vec[2];
+		expectedDstVertex[ 3 * expectedTrianglesCount + i] = srcVertex[3 * i].vec[3];
+		expectedDstVertex[ 4 * expectedTrianglesCount + i] = srcVertex[3 * i + 1].vec[0];
+		expectedDstVertex[ 5 * expectedTrianglesCount + i] = srcVertex[3 * i + 1].vec[1];
+		expectedDstVertex[ 6 * expectedTrianglesCount + i] = srcVertex[3 * i + 1].vec[2];
+		expectedDstVertex[ 7 * expectedTrianglesCount + i] = srcVertex[3 * i + 1].vec[3];
+		expectedDstVertex[ 8 * expectedTrianglesCount + i] = srcVertex[3 * i + 2].vec[0];
+		expectedDstVertex[ 9 * expectedTrianglesCount + i] = srcVertex[3 * i + 2].vec[1];
+		expectedDstVertex[10 * expectedTrianglesCount + i] = srcVertex[3 * i + 2].vec[2];
+		expectedDstVertex[11 * expectedTrianglesCount + i] = srcVertex[3 * i + 2].vec[3];
+	}
+	if (trianglesCount % 2){
+		expectedDstVertex[ 1 * expectedTrianglesCount - 1] = expectedDstVertex[ 1 * expectedTrianglesCount - 2];
+		expectedDstVertex[ 2 * expectedTrianglesCount - 1] = expectedDstVertex[ 2 * expectedTrianglesCount - 2];
+		expectedDstVertex[ 3 * expectedTrianglesCount - 1] = expectedDstVertex[ 3 * expectedTrianglesCount - 2];
+		expectedDstVertex[ 4 * expectedTrianglesCount - 1] = expectedDstVertex[ 4 * expectedTrianglesCount - 2];
+		expectedDstVertex[ 5 * expectedTrianglesCount - 1] = expectedDstVertex[ 5 * expectedTrianglesCount - 2];
+		expectedDstVertex[ 6 * expectedTrianglesCount - 1] = expectedDstVertex[ 6 * expectedTrianglesCount - 2];
+		expectedDstVertex[ 7 * expectedTrianglesCount - 1] = expectedDstVertex[ 7 * expectedTrianglesCount - 2];
+		expectedDstVertex[ 8 * expectedTrianglesCount - 1] = expectedDstVertex[ 8 * expectedTrianglesCount - 2];
+		expectedDstVertex[ 9 * expectedTrianglesCount - 1] = expectedDstVertex[ 9 * expectedTrianglesCount - 2];
+		expectedDstVertex[10 * expectedTrianglesCount - 1] = expectedDstVertex[10 * expectedTrianglesCount - 2];
+		expectedDstVertex[11 * expectedTrianglesCount - 1] = expectedDstVertex[11 * expectedTrianglesCount - 2];
+		expectedDstVertex[12 * expectedTrianglesCount - 1] = expectedDstVertex[12 * expectedTrianglesCount - 2];
+	} else {
+		// Do not correct 
 	}
 
 	// Act
     vertexPrimitiveRepack(srcVertex, srcColor,dstVertex, dstColor, mode, vertCount);
 
 	// Assert
-    TEST_ARRAYS_EQUAL (dstVertex, expectedDstVertex, outputCoordCount + trianglesCount);
+    TEST_ARRAYS_EQUAL (dstVertex, expectedDstVertex, outputCoordCount + expectedTrianglesCount);
 
     return 0;
 }
@@ -383,13 +417,14 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES81_dstColorLengthIsCorrect ()
 {
 	// Arrange
 	constexpr int trianglesCount = 81;							// number of output triangles
+	constexpr int expectedTrianglesCount = trianglesCount + trianglesCount % 2;
     constexpr int vertCount = trianglesCount * 3;				// number of input vertexes
-	constexpr int outputCoordCount = 4 * 3 * trianglesCount;	// number of output vertexes
+	constexpr int outputCoordCount = 4 * 3 * expectedTrianglesCount;	// number of output vertexes
 
     v4nm32f     srcVertex[vertCount] = {0};
     v4nm32f     srcColor[vertCount] = {0};
-    nm32f       dstVertex[outputCoordCount] = {0};	
-    v4nm32f     dstColor[3 * (trianglesCount + 1)] = {0};	// one more triangle filled with zeroes
+    nm32f       dstVertex[outputCoordCount] = {0};	// one more row filled with zeroes
+    v4nm32f     dstColor[3 * (expectedTrianglesCount + 1)] = {0};
 
     int mode = NMGL_TRIANGLES;
 
@@ -397,9 +432,9 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES81_dstColorLengthIsCorrect ()
         for (int j = 0; j < 4; j++)
             srcColor[i].vec[j] = 1;
 
-    v4nm32f expectedDstColor[3 * (trianglesCount + 1)] = {0};
+    v4nm32f expectedDstColor[3 * (expectedTrianglesCount + 1)] = {0};
 
-    for (int i = 0; i < 3 * trianglesCount; i++){
+    for (int i = 0; i < 3 * expectedTrianglesCount; i++){
         for (int j = 0; j < 4; j++){
             expectedDstColor[i].vec[j] = 1;
 		}
@@ -409,7 +444,7 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES81_dstColorLengthIsCorrect ()
     vertexPrimitiveRepack(srcVertex, srcColor,dstVertex, dstColor, mode, vertCount);
     
 	// Assert
-    TEST_VEC_ARRAYS_EQUAL (dstColor, expectedDstColor, 3 * (trianglesCount + 1));
+    TEST_VEC_ARRAYS_EQUAL (dstColor, expectedDstColor, 3 * (expectedTrianglesCount + 1));
 
     return 0;
 }
@@ -417,15 +452,17 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES81_dstColorLengthIsCorrect ()
 int vertexPrimitiveRepack_modeIsGL_TRIANGLES81_dstColorIsCorrect ()
 {
 	// Arrange
-	constexpr int trianglesCount 	= 81;						// number of output triangles
-    constexpr int vertCount 		= trianglesCount * 3;		// number of input vertexes
-	constexpr int outputCoordCount 	= 4 * 3 * trianglesCount;	// number of output vertexes
+	constexpr int trianglesCount = 81;							// number of output triangles
+	constexpr int expectedTrianglesCount = trianglesCount + trianglesCount % 2;
+    constexpr int vertCount = trianglesCount * 3;				// number of input vertexes
+	constexpr int outputCoordCount = 4 * 3 * expectedTrianglesCount;	// number of output vertexes
 
-    v4nm32f	srcVertex[vertCount] 					= {0};
-    v4nm32f	srcColor[vertCount] 					= {0};
-    nm32f  	dstVertex[outputCoordCount] 			= {0};	
-    v4nm32f	dstColor[3 * trianglesCount] 			= {0};	
-    v4nm32f	expectedDstColor[3 * trianglesCount]	= {0};
+    v4nm32f     srcVertex[vertCount] = {0};
+    v4nm32f     srcColor[vertCount] = {0};
+    nm32f       dstVertex[outputCoordCount] = {0};	// one more row filled with zeroes
+    v4nm32f     dstColor[3 * expectedTrianglesCount] = {0};
+    v4nm32f     expectedDstColor[3 * expectedTrianglesCount] = {0};
+
     int mode = NMGL_TRIANGLES;
 
     for (int i = 0; i < vertCount; i++){
@@ -441,12 +478,22 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES81_dstColorIsCorrect ()
             expectedDstColor[3 * i + 2].vec[j] = srcColor[3 * i + 2].vec[j];
 		}
 	}
+	if (trianglesCount % 2) {
+		for(int j = 0; j < 4; ++j){
+            expectedDstColor[3 * trianglesCount].vec[j] 	= expectedDstColor[3 * (trianglesCount - 1)].vec[j]    ;
+            expectedDstColor[3 * trianglesCount + 1].vec[j] = expectedDstColor[3 * (trianglesCount - 1) + 1].vec[j];
+            expectedDstColor[3 * trianglesCount + 2].vec[j] = expectedDstColor[3 * (trianglesCount - 1) + 2].vec[j];
+		}
+	} else {
+		// Do nothing
+	}
+
 
 	// Act
     vertexPrimitiveRepack(srcVertex, srcColor,dstVertex, dstColor, mode, vertCount);
 
 	// Assert
-    TEST_VEC_ARRAYS_EQUAL (dstColor, expectedDstColor, 3 * trianglesCount);
+    TEST_VEC_ARRAYS_EQUAL (dstColor, expectedDstColor, 3 * expectedTrianglesCount);
 
     return 0;
 }
@@ -598,17 +645,18 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES90_dstColorIsCorrect ()
     return 0;
 }
 
-int vertexPrimitiveRepack_modeIsGL_TRIANGLES15Vertexes_returns5()
+int vertexPrimitiveRepack_modeIsGL_TRIANGLES15Vertexes_returns6()
 {
 	// Arrange
-	constexpr int trianglesCount = 5;							// number of output triangles
+	constexpr int trianglesCount = 81;							// number of output triangles
+	constexpr int expectedTrianglesCount = trianglesCount + trianglesCount % 2;
     constexpr int vertCount = trianglesCount * 3;				// number of input vertexes
-	constexpr int outputCoordCount = 4 * 3 * trianglesCount;	// number of output vertexes
+	constexpr int outputCoordCount = 4 * 3 * expectedTrianglesCount;	// number of output vertexes
 
     v4nm32f     srcVertex[vertCount] = {0};
     v4nm32f     srcColor[vertCount] = {0};
-    nm32f       dstVertex[outputCoordCount] = {0};	
-    v4nm32f     dstColor[3 * trianglesCount] = {0};
+    nm32f       dstVertex[outputCoordCount + expectedTrianglesCount] = {0};	// one more row filled with zeroes
+    v4nm32f     dstColor[3 * expectedTrianglesCount] = {0};
 
     int mode = NMGL_TRIANGLES;
 
@@ -618,7 +666,7 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES15Vertexes_returns5()
 	
 
 	// Assert
-    TEST_ASSERT (trianglesCount == res);
+    TEST_ASSERT (expectedTrianglesCount == res);
 
     return 0;
 }
@@ -670,7 +718,60 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES90Vertexes_returns30()
 
     return 0;
 }
+#if 0
+int vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP_dstVertexLengthIsCorrect ()
+{
+	// Arrange
+	constexpr int trianglesCount = 3;							// number of output triangles
+    constexpr int vertCount = trianglesCount + 2;				// number of input vertexes
+	constexpr int expectedTrianglesCount = trianglesCount + trianglesCount % 2;
+	constexpr int outputCoordCount = 4 * 3 * expectedTrianglesCount;	// number of output vertexes
 
+    v4nm32f     srcVertex[vertCount] = {0};
+    v4nm32f     srcColor[vertCount] = {0};
+    nm32f       dstVertex[outputCoordCount + expectedTrianglesCount] = {0};	// one more row filled with zeroes
+    v4nm32f     dstColor[3 * (expectedTrianglesCount + 1)] = {0};
+
+    int mode = NMGL_TRIANGLE_STRIP;
+
+    for (int i = 0; i < vertCount; i++)
+        for (int j = 0; j < 4; j++)
+            srcVertex[i].vec[j] = 1;
+
+    nm32f expectedDstVertex[outputCoordCount + expectedTrianglesCount]  = {0};
+    for (int i = 0; i < outputCoordCount; i++){
+        expectedDstVertex[i] = 1;
+	}
+
+	for (int i = 0; i < 12; ++i){
+		for (int j = 0; j < expectedTrianglesCount; ++j){
+			printf("%f ", expectedDstVertex[expectedTrianglesCount * i + j]);
+		}
+		puts("");
+	}
+	// Act
+    vertexPrimitiveRepack(srcVertex, srcColor,dstVertex, dstColor, mode, vertCount);
+
+	for (int i = 0; i < 12; ++i){
+		for (int j = 0; j < expectedTrianglesCount; ++j){
+			printf("%f ", expectedDstVertex[expectedTrianglesCount * i + j]);
+		}
+		puts("");
+	}
+	puts("");
+	for (int i = 0; i < 12; ++i){
+		for (int j = 0; j < expectedTrianglesCount; ++j){
+			printf("%f ", dstVertex[expectedTrianglesCount * i + j]);
+		}
+		puts("");
+	}
+
+	// Assert
+    TEST_ARRAYS_EQUAL (dstVertex, expectedDstVertex, outputCoordCount + expectedTrianglesCount);
+
+    return 0;
+}
+#else
 int vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP_dstVertexLengthIsCorrect ()
 {
 	// Arrange
@@ -687,17 +788,32 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP_dstVertexLengthIsCorrect ()
             srcVertex[i].vec[j] = 1;
 
     nm32f expectedDstVertex[48]  = {0};
-    for (int i = 0; i < 36; i++)
+    for (int i = 0; i < 48; i++)
         expectedDstVertex[i] = 1;
 
 	// Act
     vertexPrimitiveRepack(srcVertex, srcColor,dstVertex, dstColor, mode, vertCount);
     
+	for (int i = 0; i < 12; ++i){
+		for (int j = 0; j < 4; ++j){
+			printf("%f ", expectedDstVertex[4 * i + j]);
+		}
+		puts("");
+	}
+	puts("");
+	for (int i = 0; i < 12; ++i){
+		for (int j = 0; j < 4; ++j){
+			printf("%f ", dstVertex[4 * i + j]);
+		}
+		puts("");
+	}
+
 	// Assert
     TEST_ARRAYS_EQUAL (dstVertex, expectedDstVertex, 48);
 
     return 0;
 }
+#endif
 
 int vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP_dstVertexIsCorrect ()
 {
