@@ -112,13 +112,13 @@ int min (int a, int b)
 }
 
 SECTION(TEXTURE_TRIANGLE_SECTION)
-int minf(float a, float b)
+float minf(float a, float b)
 {
 	return (b < a) ? b : a;
 }
 
 SECTION(TEXTURE_TRIANGLE_SECTION)
-int maxf(float a, float b)
+float maxf(float a, float b)
 {
 	return (b > a) ? b : a;
 }
