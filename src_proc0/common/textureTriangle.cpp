@@ -457,8 +457,8 @@ void textureTriangle(TrianglesInfo* triangles, nm32s* pDstTriangle, int count)
     
     long long int temp;
     nm32s* dst = pDstTriangle;
-    int winX0 = 0;
-    int winY0 = 0;
+    float winX0 = 0.0;
+    float winY0 = 0.0;
     
     for(int cnt=0;cnt<count;cnt++){
         nm32s* dstTriagle = (nm32s*) (pDstTriangle + WIDTH_PTRN * HEIGHT_PTRN * cnt);
@@ -487,14 +487,14 @@ void textureTriangle(TrianglesInfo* triangles, nm32s* pDstTriangle, int count)
 		
         v4nm32s colors = triangles->colors[cnt];
         
-		winY0 = minf(y0, minf(y1, y2)); //TODO: here should be minx of triangle 
-		winX0 = minf(x0, minf(x1, x2)); //TODO: here should be miny of triangle
+		winY0 = minf(y0, minf(y1, y2)) - 1.0f; 
+		winX0 = minf(x0, minf(x1, x2)); 
 
 		unsigned int maxX = maxf(x0, maxf(x1, x2));
 		unsigned int maxY = maxf(y0, maxf(y1, y2));
 
-		unsigned int primHeight = maxY - winY0 + 1;
-		unsigned int primWidth = maxX - winX0 + 1;
+		unsigned int primHeight = maxY - (int)winY0;
+		unsigned int primWidth = maxX - (int)winX0 + 1;
 		
 #ifdef PERSPECTIVE_CORRECT        
 		// Compute some coefficients.
