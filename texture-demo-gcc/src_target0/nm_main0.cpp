@@ -51,8 +51,13 @@ extern "C" TexImage2D teximage_4_4;
 extern "C" TexImage2D teximage_2_2;
 extern "C" TexImage2D teximage_1_1;
 extern "C" TexImage2D teximage_mytexture;
+extern "C" TexImage2D teximage_earth; //512*512
+extern "C" TexImage2D teximage_star; //512*512
 
-TexImage2D* texImages[9] = {&teximage_256_256,
+TexImage2D* texImages[9] = {
+							// &teximage_256_256,
+							// &teximage_earth,
+							&teximage_star,
 							&teximage_128_128,
 							&teximage_64_64,
 							&teximage_32_32,
@@ -154,8 +159,8 @@ SECTION(".text_shared") int main()
 	NMGLenum error;
 	unsigned time;
 	
-	nmglTexParameteri(NMGL_TEXTURE_2D, NMGL_TEXTURE_MIN_FILTER, NMGL_NEAREST);
-	nmglTexParameteri(NMGL_TEXTURE_2D, NMGL_TEXTURE_MAG_FILTER, NMGL_NEAREST);
+	nmglTexParameteri(NMGL_TEXTURE_2D, NMGL_TEXTURE_MIN_FILTER, NMGL_LINEAR);
+	nmglTexParameteri(NMGL_TEXTURE_2D, NMGL_TEXTURE_MAG_FILTER, NMGL_LINEAR);
 	nmglTexParameteri(NMGL_TEXTURE_2D, NMGL_TEXTURE_WRAP_S, NMGL_REPEAT);
 	nmglTexParameteri(NMGL_TEXTURE_2D, NMGL_TEXTURE_WRAP_T, NMGL_REPEAT);
 
