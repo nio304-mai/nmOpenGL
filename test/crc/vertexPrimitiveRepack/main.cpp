@@ -787,29 +787,33 @@ int vertexPrimitiveRepack_modeIsGL_TRIANGLES_STRIP_dstVertexLengthIsCorrect ()
         for (int j = 0; j < 4; j++)
             srcVertex[i].vec[j] = 1;
 
-    nm32f expectedDstVertex[48]  = {0};
-    for (int i = 0; i < 48; i++)
-        expectedDstVertex[i] = 1;
+    nm32f expDstVertex[48]  = {0};
+    for (int i = 0; i < 48; i++){
+        expDstVertex[i] = 1.0;
+		//printf("i: %f\n\r", expDstVertex[i]);
+	}
 
 	// Act
-    vertexPrimitiveRepack(srcVertex, srcColor,dstVertex, dstColor, mode, vertCount);
+    int res = vertexPrimitiveRepack(srcVertex, srcColor,dstVertex, dstColor, mode, vertCount);
+	printf("%x \n\r", (int) &(dstColor[12]));
     
+	printf("Function returned %x \n\r", res);
 	for (int i = 0; i < 12; ++i){
 		for (int j = 0; j < 4; ++j){
-			printf("%f ", expectedDstVertex[4 * i + j]);
+			printf("%f ", (float) expDstVertex[4 * i + j]);
 		}
 		puts("");
 	}
 	puts("");
 	for (int i = 0; i < 12; ++i){
 		for (int j = 0; j < 4; ++j){
-			printf("%f ", dstVertex[4 * i + j]);
+			printf("%f ", (float) dstVertex[4 * i + j]);
 		}
 		puts("");
 	}
 
 	// Assert
-    TEST_ARRAYS_EQUAL (dstVertex, expectedDstVertex, 48);
+    TEST_ARRAYS_EQUAL (dstVertex, expDstVertex, 48);
 
     return 0;
 }

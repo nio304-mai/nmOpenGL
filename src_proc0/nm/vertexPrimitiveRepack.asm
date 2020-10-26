@@ -317,7 +317,10 @@ begin ".text_demo3d"			// начало секции кода
 	gr0 = gr1 >> 1;
 	gr2 += gr0;			//gr2 = gr0/2 + gr1 & 1
 	copyCol(ar1, ar3, 8, 24, gr2);
+	//////////////////// Save dstColorEnd 
+	ar4 -= 12;
 	[dstColorEnd] = ar4;
+	////////////////////
 	gr0 = 1;
 	gr2 = gr1 and gr0;
 	gr0 = gr1 >> 1;
