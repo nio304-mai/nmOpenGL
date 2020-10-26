@@ -348,6 +348,15 @@ begin ".text_demo3d"			// начало секции кода
 	// GL_TRIANGLE_FAN: (vertCount - 2)
 	gr0 = 2;				
 	gr1 = gr6 - gr0;	
+	// Set parity flag
+	gr7 = gr1;
+	gr3 = 1;
+	gr7 = gr7 and gr3;
+	[parity] = gr7;
+	// Round gr1 to nearest even (+1 in case of odd, the same in case of even)
+	gr1 = gr1 + 1;
+	gr1 >>= 1;
+	gr1 <<= 1;
 	[retVal] = gr1;
 	// Get xy coordinates of A points
 	gr0 = gr1;	// gr0 - loop counter	
@@ -382,6 +391,10 @@ begin ".text_demo3d"			// начало секции кода
 	
 	// Extract colors
 	copyCol(ar1, ar3, 0, 12, gr1);
+	//////////////////// Save dstColorEnd 
+	ar4 -= 12;
+	[dstColorEnd] = ar4;
+	////////////////////
 	copyCol(ar1 + 4, ar3 + 4, 4, 12, gr1);
 	copyCol(ar1 + 8, ar3 + 8, 4, 12, gr1);
 
