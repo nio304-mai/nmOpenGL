@@ -217,6 +217,65 @@ static double sum_of_arithmetic_progression(double a1, double an, double n){
 	return (n * (a1 + an) / 2);
 }
 
+double linear_get_ab_k_coeff(const struct Point *p1, const struct Point *p2)
+{
+	return ((p1->y - p2->y) / (p1->x - p2->x));
+}
+
+double linear_get_ab_b_coeff(const struct Point *p1, const struct Point *p2)
+{
+	return ((p1->x * p2->y - p2->x * p1->y) / (p1->x - p2->x));
+}
+
+double linear(double x, double k, double b)
+{
+	return (k * x + b); 
+}
+
+void buildPoints(const Triangle *tr, int n)
+{
+	struct Point a = tr->points[0];
+	struct Point b = tr->points[1];
+	struct Point c = tr->points[2];
+	double ab_k_coeff = linear_get_ab_k_coeff(&a, &b);
+	double ab_b_coeff = linear_get_ab_b_coeff(&a, &b);
+	printf("a, b constitute the equation y = %fx%+f\n\r", ab_k_coeff, ab_b_coeff);
+	double ab_dx = (b.x - a.x) / n;
+	double ab_dy = (b.y - a.y) / n;
+	double ac_dx = (c.x - a.x) / n;
+	double ac_dy = (c.y - a.y) / n;
+	struct Point points[256][256];
+	for (int i = 0; i < n; ++i){
+		double ab_x = a.x + i * ab_dx;
+		double ab_y = a.y + i * ab_dy;
+		//printf("%f %f\n\r", ab_x, ab_y);
+		for (int j = 0; j < n + 1 - i; ++j){
+			points[i][j].x = ab_x + j * ac_dx;
+			points[i][j].y = ab_y + j * ac_dy;
+		}
+	}
+	points[n][0].x = b.x;
+	points[n][0].y = b.y;
+	printf("GLfloat tr_set_1[%i] = {\n\r", (int) (6 * sum_of_arithmetic_progression(1, n, n)));
+	for (int i = 0; i < n; ++i){
+		for (int j = 0; j < n - i; ++j){
+			printf("%f,%f,%f,%f,%f,%f,\n\r", points[i][j].x, points[i][j].y, 
+							points[i + 1][j].x, points[i + 1][j].y,
+							points[i][j + 1].x, points[i][j + 1].y);
+		}
+	}
+	printf("};\n\r");
+	printf("GLfloat tr_set_2[%i] = {\n\r", (int) (6 * sum_of_arithmetic_progression(1, n - 1, n - 1)));
+	for (int i = 1; i < n; ++i){
+		for (int j = 0; j < n - i; ++j){
+			printf("%f,%f,%f,%f,%f,%f,\n\r", points[i][j].x, points[i][j].y, 
+							points[i][j + 1].x, points[i][j + 1].y,
+							points[i - 1][j + 1].x, points[i - 1][j + 1].y);
+		}
+	}
+	printf("};\n\r");
+}
+
 // Return:
 // -1 - деление не удалось, в выходном буфере нет места
 // n - текущее количество треугольников в выходном буфере
@@ -253,6 +312,7 @@ int triangulateOneTriangle(	const Triangle& tr,
 		printf("Number of triangles is %f\n\r", n_of_triangles);
 		if (n_of_triangles > vsize){
 			//There are no more space in output buffer
+			buildPoints(&tr, (int) n);
 		} else {
 			// Get the points of triangle and push it to the output buffer
 		}
