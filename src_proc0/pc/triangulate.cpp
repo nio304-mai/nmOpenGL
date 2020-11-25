@@ -213,6 +213,10 @@ int triangulate(const nm32f *srcVertex,
 	return currentDstSize;
 }
 
+static double sum_of_arithmetic_progression(double a1, double an, double n){
+	return (n * (a1 + an) / 2);
+}
+
 // Return:
 // -1 - деление не удалось, в выходном буфере нет места
 // n - текущее количество треугольников в выходном буфере
@@ -245,7 +249,9 @@ int triangulateOneTriangle(	const Triangle& tr,
 		double max_size = min_fabs_in_array(sizes, 2);
 		double n = floor(max_length / max_size);
 		printf("n = %f\n\r", n);
-		if (n > vsize){
+		double n_of_triangles = sum_of_arithmetic_progression(1, 2 * n - 1, n);
+		printf("Number of triangles is %f\n\r", n_of_triangles);
+		if (n_of_triangles > vsize){
 			//There are no more space in output buffer
 		} else {
 			// Get the points of triangle and push it to the output buffer
