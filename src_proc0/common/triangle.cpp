@@ -14,6 +14,19 @@ double max_fabs_in_array(const double *array, int cnt)
 	return max;
 }
 
+double min_fabs_in_array(const double *array, int cnt)
+{
+	double min = array[0];
+	for (int i = 1; i < cnt; ++i){
+		if (fabs(array[i]) < min){
+			min = fabs(array[i]);
+		} else {
+			// Do nothing 
+		}
+	}
+	return min;
+}
+
 nm32f Triangle::edgeSize(int i) const
 {
 	Point p1 = points[edges[i].p1];

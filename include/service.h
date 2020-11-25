@@ -236,6 +236,7 @@ static int popBackColors(Buffer *cbuf, Colors *colors);
 int triangulateOneTriangle(const Triangle& tr, nm32f xMax, nm32f yMax, Buffer *verticesStack, Buffer *colorsStack);
 int splitOneTriangle(const Triangle& tr, nm32f xMax, nm32f yMax, Buffer *buf);
 double max_fabs_in_array(const double *array, int cnt);
+double min_fabs_in_array(const double *array, int cnt);
 
 /*
  * Init function for performance test
