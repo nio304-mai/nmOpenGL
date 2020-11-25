@@ -191,6 +191,8 @@ struct Triangle {
 	nm32f edgeSize(int i) const;
 	bool isTooBig(nm32f xMax, nm32f yMax) const;
 	edgeProjection edgeGetProjection(int i) const;
+	double GetWidth(void) const;
+	double GetHeight(void) const;
 };
 
 typedef struct Vertices 
@@ -233,6 +235,7 @@ static int popBackColors(Buffer *cbuf, Colors *colors);
 
 int triangulateOneTriangle(const Triangle& tr, nm32f xMax, nm32f yMax, Buffer *verticesStack, Buffer *colorsStack);
 int splitOneTriangle(const Triangle& tr, nm32f xMax, nm32f yMax, Buffer *buf);
+double max_fabs_in_array(const double *array, int cnt);
 
 /*
  * Init function for performance test
