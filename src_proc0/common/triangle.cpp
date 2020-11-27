@@ -1,9 +1,9 @@
 #include <cmath>
 #include "service.h"
 
-double max_fabs_in_array(const double *array, int cnt)
+nm32f max_fabs_in_array(const nm32f *array, int cnt)
 {
-	double max = 0.0;
+	nm32f max = 0.0;
 	for (int i = 0; i < cnt; ++i){
 		if (fabs(array[i]) > max){
 			max = fabs(array[i]);
@@ -14,9 +14,9 @@ double max_fabs_in_array(const double *array, int cnt)
 	return max;
 }
 
-double min_fabs_in_array(const double *array, int cnt)
+nm32f min_fabs_in_array(const nm32f *array, int cnt)
 {
-	double min = array[0];
+	nm32f min = array[0];
 	for (int i = 1; i < cnt; ++i){
 		if (fabs(array[i]) < min){
 			min = fabs(array[i]);
@@ -67,17 +67,17 @@ bool Triangle::isTooBig(nm32f xMax, nm32f yMax) const
 	}
 }
 
-double Triangle::GetWidth(void) const
+nm32f Triangle::GetWidth(void) const
 {
-	double widths[3] = {points[0].x - points[1].x, 
+	nm32f widths[3] = {points[0].x - points[1].x, 
 						points[1].x - points[2].x, 
 						points[2].x - points[0].x};
 	return max_fabs_in_array(widths, 3);
 }
 
-double Triangle::GetHeight(void) const
+nm32f Triangle::GetHeight(void) const
 {
-	double heights[3] = {points[0].y - points[1].y, 
+	nm32f heights[3] = {points[0].y - points[1].y, 
 						 points[1].y - points[2].y, 
 						 points[2].y - points[0].y};
 	return max_fabs_in_array(heights, 3);

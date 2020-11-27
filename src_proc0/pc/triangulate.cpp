@@ -213,42 +213,25 @@ int triangulate(const nm32f *srcVertex,
 	return currentDstSize;
 }
 
-static double sum_of_arithmetic_progression(double a1, double an, double n){
+static nm32f sum_of_arithmetic_progression(nm32f a1, nm32f an, nm32f n){
 	return (n * (a1 + an) / 2);
 }
 
-double linear_get_ab_k_coeff(const struct Point *p1, const struct Point *p2)
+void buildPoints(const Triangle &tr, int n, Point *points)
 {
-	return ((p1->y - p2->y) / (p1->x - p2->x));
-}
+	struct Point a = tr.points[0];
+	struct Point b = tr.points[1];
+	struct Point c = tr.points[2];
 
-double linear_get_ab_b_coeff(const struct Point *p1, const struct Point *p2)
-{
-	return ((p1->x * p2->y - p2->x * p1->y) / (p1->x - p2->x));
-}
+	nm32f ab_dx = (b.x - a.x) / n;
+	nm32f ab_dy = (b.y - a.y) / n;
+	nm32f ac_dx = (c.x - a.x) / n;
+	nm32f ac_dy = (c.y - a.y) / n;
 
-double linear(double x, double k, double b)
-{
-	return (k * x + b); 
-}
-
-void buildPoints(const Triangle *tr, int n)
-{
-	struct Point a = tr->points[0];
-	struct Point b = tr->points[1];
-	struct Point c = tr->points[2];
-	double ab_k_coeff = linear_get_ab_k_coeff(&a, &b);
-	double ab_b_coeff = linear_get_ab_b_coeff(&a, &b);
-	printf("a, b constitute the equation y = %fx%+f\n\r", ab_k_coeff, ab_b_coeff);
-	double ab_dx = (b.x - a.x) / n;
-	double ab_dy = (b.y - a.y) / n;
-	double ac_dx = (c.x - a.x) / n;
-	double ac_dy = (c.y - a.y) / n;
-	struct Point points[256][256];
+	Point points[128][128];
 	for (int i = 0; i < n; ++i){
-		double ab_x = a.x + i * ab_dx;
-		double ab_y = a.y + i * ab_dy;
-		//printf("%f %f\n\r", ab_x, ab_y);
+		nm32f ab_x = a.x + i * ab_dx;
+		nm32f ab_y = a.y + i * ab_dy;
 		for (int j = 0; j < n + 1 - i; ++j){
 			points[i][j].x = ab_x + j * ac_dx;
 			points[i][j].y = ab_y + j * ac_dy;
@@ -256,21 +239,24 @@ void buildPoints(const Triangle *tr, int n)
 	}
 	points[n][0].x = b.x;
 	points[n][0].y = b.y;
+
 	printf("GLfloat tr_set_1[%i] = {\n\r", (int) (6 * sum_of_arithmetic_progression(1, n, n)));
 	for (int i = 0; i < n; ++i){
 		for (int j = 0; j < n - i; ++j){
-			printf("%f,%f,%f,%f,%f,%f,\n\r", points[i][j].x, points[i][j].y, 
-							points[i + 1][j].x, points[i + 1][j].y,
-							points[i][j + 1].x, points[i][j + 1].y);
+			printf("%f,%f,%f,%f,%f,%f,\n\r", 
+					points[i][j].x, points[i][j].y, 
+					points[i + 1][j].x, points[i + 1][j].y,
+					points[i][j + 1].x, points[i][j + 1].y);
 		}
 	}
 	printf("};\n\r");
 	printf("GLfloat tr_set_2[%i] = {\n\r", (int) (6 * sum_of_arithmetic_progression(1, n - 1, n - 1)));
 	for (int i = 1; i < n; ++i){
 		for (int j = 0; j < n - i; ++j){
-			printf("%f,%f,%f,%f,%f,%f,\n\r", points[i][j].x, points[i][j].y, 
-							points[i][j + 1].x, points[i][j + 1].y,
-							points[i - 1][j + 1].x, points[i - 1][j + 1].y);
+			printf("%f,%f,%f,%f,%f,%f,\n\r",
+					points[i][j].x, points[i][j].y, 
+					points[i][j + 1].x, points[i][j + 1].y,
+					points[i - 1][j + 1].x, points[i - 1][j + 1].y);
 		}
 	}
 	printf("};\n\r");
@@ -289,55 +275,47 @@ int triangulateOneTriangle(	const Triangle& tr,
 	// (at least for input triangle (if it is OK and don't be splitted))
 	int vsize = bufSpace(verticesStack);
 	if (vsize < 1){
-			return -1;
+		// No space in output buffer
+		return -1;
 	} else {
-			// do nothing here, just continue
+		// Do nothing here, just continue
 	}
 
 	// Process the triangle:
 	// Check the size and split if it is necessary
 	if (tr.isTooBig(maxWidth, maxHeight)){
 		//Get the number of output triangles
-		double triangle_width = tr.GetWidth();
-		double triangle_height = tr.GetHeight();
+		nm32f triangle_width = tr.GetWidth();
+		nm32f triangle_height = tr.GetHeight();
 		printf("Triangle width is %f\n\r", triangle_width);
 		printf("Triangle height is %f\n\r", triangle_height);
-		double lengths[2] = {triangle_width, triangle_height};
-		double max_length = max_fabs_in_array(lengths, 2);
-		double sizes[2] = {maxWidth, maxHeight};
-		double max_size = min_fabs_in_array(sizes, 2);
-		double n = floor(max_length / max_size);
+		nm32f lengths[2] = {triangle_width, triangle_height};
+		nm32f max_length = max_fabs_in_array(lengths, 2);
+		nm32f sizes[2] = {maxWidth, maxHeight};
+		nm32f max_size = min_fabs_in_array(sizes, 2);
+		nm32f n = floor(max_length / max_size);
 		printf("n = %f\n\r", n);
-		double n_of_triangles = sum_of_arithmetic_progression(1, 2 * n - 1, n);
+		nm32f n_of_triangles = sum_of_arithmetic_progression(1, 2 * n - 1, n);
 		printf("Number of triangles is %f\n\r", n_of_triangles);
 		if (n_of_triangles > vsize){
 			//There are no more space in output buffer
-			buildPoints(&tr, (int) n);
 		} else {
 			// Get the points of triangle and push it to the output buffer
+			buildPoints(tr, (int) n);
 		}
 	} else {
 		// Triangle size is OK
 		// Push the triangle to the output 
-		// There is always place in output buffer
-		// because one triangle is popped out of the buffer
 		Vertices trVertices = {
-			tr.points[0].x,
-			tr.points[0].y,
-			tr.points[0].z,
-			tr.points[1].x,
-			tr.points[1].y,
-			tr.points[1].z,
-			tr.points[2].x,
-			tr.points[2].y,
-			tr.points[2].z
+			tr.points[0].x, tr.points[0].y, tr.points[0].z,
+			tr.points[1].x, tr.points[1].y, tr.points[1].z,
+			tr.points[2].x, tr.points[2].y, tr.points[2].z
 		};
 		Colors trColors = {
 			tr.points[0].color,
 			tr.points[1].color,
 			tr.points[2].color
 		};
-
 		pushFrontVertices(verticesStack, &trVertices);
 		pushFrontColors(colorsStack, &trColors);
 	}
