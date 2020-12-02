@@ -228,18 +228,33 @@ void buildPoints(const Triangle &tr, nm32f *x, nm32f *y, int n)
 	nm32f ac_dx = (c.x - a.x) / n;
 	nm32f ac_dy = (c.y - a.y) / n;
 	
-	nm32f start_points[n + 1] = {0};
 	for (int i = 0; i < n; ++i){
-		nm32f ab_x = a.x + i * ab_dx;
-		nm32f ab_y = a.y + i * ab_dy;
-		for (int j = 0; j < n + 1 - i; ++j){
-			x[i * n + j] = ab_x + j * ac_dx;
-			y[i * n + j] = ab_y + j * ac_dy;
-		}
+		x[i] = a.x + i * ac_dx;
+		y[i] = a.y + i * ac_dy;
 	}
-	x[n * n + 0] = b.x;
-	y[n * n + 0] = b.y;
-
+	x[n] = c.x;
+	y[n] = c.y;
+	n += n & 1;
+	int k = n / 2;
+	asm (
+		"push ar0, gr0; \n\t"
+		"push ar1, gr1; \n\t"
+		"vlen = %4; \n\t"
+		"ar0 = %0; \n\t"
+		"ar1 = %0 with gr1 = %4; \n\t"
+		"ar1++gr1; \n\t"
+		"fpu 0 rep vlen vreg2 = [ar0++]; \n\t"
+		"fpu 0 rep vlen [ar1++] = vreg2; \n\t"
+		"pop ar1, gr1; \n\t"
+		"pop ar0, gr0; \n\t"
+		: "+rm" (x), "+rm" (y)
+		: "rm" (x), "rm" (y), "rm" (n)
+		:
+	);
+	for (int i = 0; i < 2 * (n + 1); ++i){
+			printf("%f ", x[i]);
+	}
+	puts("");
 }
 
 void printPoints(const nm32f *x, const nm32f *y, int n)
