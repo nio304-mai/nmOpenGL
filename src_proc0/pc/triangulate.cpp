@@ -217,7 +217,7 @@ static nm32f sum_of_arithmetic_progression(nm32f a1, nm32f an, nm32f n){
 	return (n * (a1 + an) / 2);
 }
 
-void buildPoints(const Triangle &tr, int n, Point *points)
+void buildPoints(const Triangle &tr, nm32f *x, nm32f *y, int n)
 {
 	struct Point a = tr.points[0];
 	struct Point b = tr.points[1];
@@ -228,38 +228,77 @@ void buildPoints(const Triangle &tr, int n, Point *points)
 	nm32f ac_dx = (c.x - a.x) / n;
 	nm32f ac_dy = (c.y - a.y) / n;
 
-	Point points[128][128];
 	for (int i = 0; i < n; ++i){
 		nm32f ab_x = a.x + i * ab_dx;
 		nm32f ab_y = a.y + i * ab_dy;
 		for (int j = 0; j < n + 1 - i; ++j){
-			points[i][j].x = ab_x + j * ac_dx;
-			points[i][j].y = ab_y + j * ac_dy;
+			x[i * n + j] = ab_x + j * ac_dx;
+			y[i * n + j] = ab_y + j * ac_dy;
 		}
 	}
-	points[n][0].x = b.x;
-	points[n][0].y = b.y;
+	x[n * n + 0] = b.x;
+	y[n * n + 0] = b.y;
 
-	printf("GLfloat tr_set_1[%i] = {\n\r", (int) (6 * sum_of_arithmetic_progression(1, n, n)));
-	for (int i = 0; i < n; ++i){
-		for (int j = 0; j < n - i; ++j){
-			printf("%f,%f,%f,%f,%f,%f,\n\r", 
-					points[i][j].x, points[i][j].y, 
-					points[i + 1][j].x, points[i + 1][j].y,
-					points[i][j + 1].x, points[i][j + 1].y);
+}
+
+void printPoints(const nm32f *x, const nm32f *y, int n)
+{
+		printf("GLfloat tr_set_1[%i] = {\n\r", (int) (6 * sum_of_arithmetic_progression(1, n, n)));
+		for (int i = 0; i < n; ++i){
+				for (int j = 0; j < n - i; ++j){
+						printf("%f,%f,%f,%f,%f,%f,\n\r", 
+										x[i * n + j], y[i * n + j], 
+										x[(i + 1) * n + j], y[(i + 1) * n + j],
+										x[i * n + (j + 1)], y[i * n + (j + 1)]);
+				}
 		}
-	}
-	printf("};\n\r");
-	printf("GLfloat tr_set_2[%i] = {\n\r", (int) (6 * sum_of_arithmetic_progression(1, n - 1, n - 1)));
-	for (int i = 1; i < n; ++i){
-		for (int j = 0; j < n - i; ++j){
-			printf("%f,%f,%f,%f,%f,%f,\n\r",
-					points[i][j].x, points[i][j].y, 
-					points[i][j + 1].x, points[i][j + 1].y,
-					points[i - 1][j + 1].x, points[i - 1][j + 1].y);
+		printf("};\n\r");
+		printf("GLfloat tr_set_2[%i] = {\n\r", (int) (6 * sum_of_arithmetic_progression(1, n - 1, n - 1)));
+		for (int i = 1; i < n; ++i){
+				for (int j = 0; j < n - i; ++j){
+						printf("%f,%f,%f,%f,%f,%f,\n\r",
+										x[i * n + j], y[i * n + j], 
+										x[i * n + (j + 1)], y[i * n + (j + 1)],
+										x[(i - 1) * n + (j + 1)], y[(i - 1) * n + (j + 1)]);
+				}
 		}
-	}
-	printf("};\n\r");
+		printf("};\n\r");
+}
+
+void pushTriangles(const nm32f *x, const nm32f *y, int n, Buffer *verticesStack, Buffer *colorsStack)
+{
+		for (int i = 0; i < n; ++i){
+				for (int j = 0; j < n - i; ++j){
+						Vertices trVertices = {
+								x[i * n + j], y[i * n + j], 0,
+								x[(i + 1) * n + j], y[(i + 1) * n + j], 0,
+								x[i * n + (j + 1)], y[i * n + (j + 1)]
+						};
+						Colors trColors = {
+								0,
+								0,
+								0
+						};
+						pushFrontVertices(verticesStack, &trVertices);
+						pushFrontColors(colorsStack, &trColors);
+				}
+		}
+		for (int i = 1; i < n; ++i){
+				for (int j = 0; j < n - i; ++j){
+						Vertices trVertices = {
+								x[i * n + j], y[i * n + j], 0, 
+								x[i * n + (j + 1)], y[i * n + (j + 1)], 0, 
+								x[(i - 1) * n + (j + 1)], y[(i - 1) * n + (j + 1)], 0
+						};
+						Colors trColors = {
+								0,
+								0,
+								0
+						};
+						pushFrontVertices(verticesStack, &trVertices);
+						pushFrontColors(colorsStack, &trColors);
+				}
+		}
 }
 
 // Return:
@@ -281,27 +320,32 @@ int triangulateOneTriangle(	const Triangle& tr,
 		// Do nothing here, just continue
 	}
 
-	// Process the triangle:
-	// Check the size and split if it is necessary
+	// Process the triangle: check the size and split if it is necessary
 	if (tr.isTooBig(maxWidth, maxHeight)){
 		//Get the number of output triangles
 		nm32f triangle_width = tr.GetWidth();
 		nm32f triangle_height = tr.GetHeight();
-		printf("Triangle width is %f\n\r", triangle_width);
-		printf("Triangle height is %f\n\r", triangle_height);
+		//printf("Triangle width is %f\n\r", triangle_width);
+		//printf("Triangle height is %f\n\r", triangle_height);
 		nm32f lengths[2] = {triangle_width, triangle_height};
 		nm32f max_length = max_fabs_in_array(lengths, 2);
+
 		nm32f sizes[2] = {maxWidth, maxHeight};
 		nm32f max_size = min_fabs_in_array(sizes, 2);
+
 		nm32f n = floor(max_length / max_size);
-		printf("n = %f\n\r", n);
+		//printf("n = %f\n\r", n);
 		nm32f n_of_triangles = sum_of_arithmetic_progression(1, 2 * n - 1, n);
-		printf("Number of triangles is %f\n\r", n_of_triangles);
+		//printf("Number of triangles is %f\n\r", n_of_triangles);
 		if (n_of_triangles > vsize){
-			//There are no more space in output buffer
+			//There are no space in the output buffer for this number of triangles
 		} else {
 			// Get the points of triangle and push it to the output buffer
-			buildPoints(tr, (int) n);
+			float x[16384];
+			float y[16384];
+			buildPoints(tr, x, y, (int) n);
+			printPoints(x, y, (int) n);
+			pushTriangles(x, y, (int) n, verticesStack, colorsStack);
 		}
 	} else {
 		// Triangle size is OK
