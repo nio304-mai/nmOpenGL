@@ -455,6 +455,19 @@ void nmglDrawArrays(NMGLenum mode, NMGLint first, NMGLsizei count) {
 				nmblas_scopy(currentCount, tmp0.v1.y, 1, cntxt->trianInner.y1, 1);
 				nmblas_scopy(currentCount, tmp0.v2.x, 1, cntxt->trianInner.x2, 1);
 				nmblas_scopy(currentCount, tmp0.v2.y, 1, cntxt->trianInner.y2, 1);
+
+/*****************************************/
+				//repeat previous function 5 or 6 times. 5 - exmaple works. 6 - does not work
+				
+				//nmblas_scopy(currentCount, tmp0.v2.y, 1, cntxt->trianInner.y2, 1); //uncomment to break application
+				nmblas_scopy(currentCount, tmp0.v2.y, 1, cntxt->trianInner.y2, 1);
+				nmblas_scopy(currentCount, tmp0.v2.y, 1, cntxt->trianInner.y2, 1);
+				nmblas_scopy(currentCount, tmp0.v2.y, 1, cntxt->trianInner.y2, 1);
+				nmblas_scopy(currentCount, tmp0.v2.y, 1, cntxt->trianInner.y2, 1);
+				nmblas_scopy(currentCount, tmp0.v2.y, 1, cntxt->trianInner.y2, 1);
+
+/*****************************************/
+				
 				meanToInt3(tmp0.v0.z, tmp0.v1.z, tmp0.v2.z, cntxt->trianInner.z, currentCount);
 				nmppsConvert_32f32s_rounding((float*)colorOrNormal, (int*)cntxt->trianInner.colors, 0, 4 * currentCount);
 				cntxt->trianInner.size = currentCount;
