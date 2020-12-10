@@ -227,7 +227,7 @@ void buildPoints(const Triangle &tr, nm32f *x, nm32f *y, nm32f *z, int n)
 
 	nm32f ab_dx = (b.x - a.x) / n;
 	nm32f ab_dx_64[2] = {ab_dx, ab_dx};
-	nm32f *ab_dx_ptr = &ab_dx;
+	//nm32f *ab_dx_ptr = &ab_dx;
 	//printf("ab_dx = %f\n\r", ab_dx);
 	//printf("ab_dx_64 = %f\n\r", ab_dx_64[0]);
 	nm32f ab_dy = (b.y - a.y) / n;
@@ -243,16 +243,16 @@ void buildPoints(const Triangle &tr, nm32f *x, nm32f *y, nm32f *z, int n)
 	
 	for (int i = 0; i < n; ++i){
 		x[i] = a.x + i * ac_dx;
-		y[i] = a.y + i * ac_dy;
-		z[i] = a.z + i * ac_dz;
+	//	y[i] = a.y + i * ac_dy;
+	//	z[i] = a.z + i * ac_dz;
 		bc_z[i] = b.z + i * bc_dz;
 		dz[i] = (bc_z[i] - z[i]) / (n - i);
 	}
-	x[n] = c.x;
-	y[n] = c.y;
-	z[n] = c.z;
-	dz[n] = 0.0;
-	int k = (n + 1) + (n + 1) % 2;
+	//x[n] = c.x;
+	//y[n] = c.y;
+	//z[n] = c.z;
+	//dz[n] = 0.0;
+	//int k = (n + 1) + (n + 1) % 2;
 #if 0
 	asm (
 		"push ar0, gr0;\n\t"
@@ -273,9 +273,9 @@ void buildPoints(const Triangle &tr, nm32f *x, nm32f *y, nm32f *z, int n)
 		:
 	);
 #else 
-	int nrows = buildMatrix(x, ab_dx_64, k);
-	nrows = buildMatrix(y, ab_dy_64, k);
-	nrows = buildMatrix(z, dz, k);
+	//int nrows = buildMatrix(x, ab_dx_64, k);
+	//nrows = buildMatrix(y, ab_dy_64, k);
+	//nrows = buildMatrix(z, dz, k);
 	//printf("Processed %i rows\n\r", nrows);
 #endif
 	//printf("k = %i\n\r", k);
@@ -403,7 +403,65 @@ int triangulateOneTriangle(	const Triangle& tr,
 			float x[16384];
 			float y[16384];
 			float z[16384];
-			buildPoints(tr, x, y, z, (int) n);
+			//buildPoints(tr, x, y, z, (int) n);
+	struct Point a = tr.points[0];
+	struct Point b = tr.points[1];
+	struct Point c = tr.points[2];
+
+	nm32f ab_dx = (b.x - a.x) / n;
+	nm32f ab_dx_64[2] = {ab_dx, ab_dx};
+	//nm32f *ab_dx_ptr = &ab_dx;
+	//printf("ab_dx = %f\n\r", ab_dx);
+	//printf("ab_dx_64 = %f\n\r", ab_dx_64[0]);
+	nm32f ab_dy = (b.y - a.y) / n;
+	nm32f ab_dy_64[2] = {ab_dy, ab_dy};
+
+	nm32f ac_dx = (c.x - a.x) / n;
+	nm32f ac_dy = (c.y - a.y) / n;
+	nm32f ac_dz = (c.z - a.z) / n;
+
+	nm32f bc_dz = (c.z - b.z) / n;
+	nm32f bc_z[16384];
+	nm32f dz[16384];
+
+	int i = 0;
+	for (i = 0; i < (int) n; ++i){
+		x[i] = a.x + i * ac_dx;
+		y[i] = a.y + i * ac_dy;
+		z[i] = a.z + i * ac_dz;
+		bc_z[i] = b.z + i * bc_dz;
+		dz[i] = (bc_z[i] - z[i]) / (n - i);
+	}
+	x[i] = c.x;
+	y[i] = c.y;
+	z[i] = c.z;
+	dz[i] = 0.0;
+	int k = (i + 1) + (i + 1) % 2;	// i = n at this moment
+#if 0
+	asm (
+		"push ar0, gr0;\n\t"
+		"push ar1, gr1;\n\t"
+		"ar0 = %0;\n\t"
+		"ar1 = %0 with gr1 = %5;\n\t"
+		"ar1++gr1;\n\t"
+		"gr1 >>= 1;\n\t"
+		"gr1--;\n\t"
+		"vlen = gr1;\n\t"
+		"fpu 0 rep vlen vreg2 = [ar0++];\n\t"
+		"ar0 = %2;\n\t"
+		"fpu 0 rep vlen [ar1++] = vreg2;\n\t"
+		"pop ar1, gr1;\n\t"
+		"pop ar0, gr0;\n\t"
+		: "+rm" (x), "+rm" (y), "+rm" (ab_dx_64)
+		: "rm" (x), "rm" (y), "rm" (k)
+		:
+	);
+#else 
+	buildMatrix(x, ab_dx_64, k);
+	buildMatrix(y, ab_dy_64, k);
+	buildMatrix(z, dz, k);
+	//printf("Processed %i rows\n\r", nrows);
+#endif
 			printPoints(x, y, z, (int) n);
 			pushTriangles(x, y, z, (int) n, verticesStack, colorsStack);
 		}
