@@ -27,6 +27,21 @@ nm32f min_fabs_in_array(const nm32f *array, int cnt)
 	return min;
 }
 
+static void sort(nm32f *array, int cnt)
+{
+	for (int i = 0; i < cnt - 1; ++i){
+		for (int j = i + 1; j < cnt; ++j){
+			if (array[j] < array[i]){
+				nm32f tmp = array[i];
+				array[i] = array[j];
+				array[j] = tmp;
+			} else {
+				// Do nothing 
+			}
+		}
+	}
+}
+
 nm32f Triangle::edgeSize(int i) const
 {
 	Point p1 = points[edges[i].p1];
@@ -69,16 +84,14 @@ bool Triangle::isTooBig(nm32f xMax, nm32f yMax) const
 
 nm32f Triangle::GetWidth(void) const
 {
-	nm32f widths[3] = {points[0].x - points[1].x, 
-						points[1].x - points[2].x, 
-						points[2].x - points[0].x};
-	return max_fabs_in_array(widths, 3);
+	nm32f x[3] = {points[0].x, points[1].x, points[2].x};
+	sort(x, 3);
+	return (x[2] - x[0]);
 }
 
 nm32f Triangle::GetHeight(void) const
 {
-	nm32f heights[3] = {points[0].y - points[1].y, 
-						 points[1].y - points[2].y, 
-						 points[2].y - points[0].y};
-	return max_fabs_in_array(heights, 3);
+	nm32f y[3] = {points[0].y, points[1].y, points[2].y};
+	sort(y, 3);
+	return (y[2] - y[0]);
 }
