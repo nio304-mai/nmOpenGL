@@ -3,8 +3,8 @@
 
 nm32f max_fabs_in_array(const nm32f *array, int cnt)
 {
-	nm32f max = 0.0;
-	for (int i = 0; i < cnt; ++i){
+	nm32f max = fabs(array[0]);
+	for (int i = 1; i < cnt; ++i){
 		if (fabs(array[i]) > max){
 			max = fabs(array[i]);
 		} else {
@@ -16,7 +16,7 @@ nm32f max_fabs_in_array(const nm32f *array, int cnt)
 
 nm32f min_fabs_in_array(const nm32f *array, int cnt)
 {
-	nm32f min = array[0];
+	nm32f min = fabs(array[0]);
 	for (int i = 1; i < cnt; ++i){
 		if (fabs(array[i]) < min){
 			min = fabs(array[i]);
