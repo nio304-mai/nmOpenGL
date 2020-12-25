@@ -1,5 +1,6 @@
 #include <cmath> // pow for NMC-SDK
 #include "service.h"
+#include "time.h"
 
 static Buffer initBuf(void *data, int size)
 {
@@ -318,6 +319,22 @@ void pushTriangles(const nm32f *x, const nm32f *y, const nm32f *z, int n, Buffer
 	}
 }
 
+int ceil_1(int a, int b)
+{
+		return (a / b + ((a % b) != 0));
+}
+
+int ceil_2(int a, int b)
+{
+		return ((a + b - 1) / b);
+}
+
+#define MEASURE(x) \
+		clock_t t1 = clock();\
+		x;\
+		clock_t t2 = clock();\
+		printf("Measure: %i\n\r", (int) (t2 - t1));\
+
 // Return:
 // -1 - деление не удалось, в выходном буфере нет места
 // n - текущее количество треугольников в выходном буфере
@@ -347,7 +364,9 @@ int triangulateOneTriangle(	const Triangle& tr,
 		//Get the number of output triangles
 		nm32f max_length = triangle_width > triangle_height ? triangle_width: triangle_height; // max of ...
 		nm32f max_size = maxWidth < maxHeight ? maxWidth: maxHeight; // min of ...
-		nm32f n = ceil(max_length / max_size);
+		//nm32f n = ceil(max_length / max_size);
+		//MEASURE(int n = ceil_1((int) max_length, (int) max_size))
+		int n = ceil_2((int) max_length, (int) max_size);
 		nm32f n_of_triangles = n * n;
 
 		if (n_of_triangles > vsize){
