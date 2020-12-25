@@ -1,11 +1,8 @@
-// void buildMatrix(nm32f *array, const nm32f *delta, int k);
-
 global _buildMatrix: label;// объявление глобальной метки
 
 data ".data_demo3d"        //секция инициализированных данных
-	M10: word[2] = (float(1), float(0)); // extract X0,X1 from (X0,Y0;X1,Y1)T vec
-	buf: word[64];					// buf to copy odd words from vreg to mem
-	tmpAddress: word;				// used to remember address of y or w row
+	dx: long;
+	dy: long;
 end ".data_demo3d";  
 
 begin ".text_demo3d"			// начало секции кода
@@ -21,16 +18,29 @@ begin ".text_demo3d"			// начало секции кода
     push ar6,gr6;
     
     ar0 = [--ar5];  // x coords
-    ar2 = [--ar5];  // delta for x
+    ar4 = [--ar5];  // y coords
+    ar6 = [--ar5];  // z coords
+    ar2 = [--ar5];  // deltaX, deltaY
+    ar1 = [--ar5];  // deltaZ
+
     gr0 = [--ar5];  // k 
 
+	gr7 = gr0;
+	goto Exit;
+	
+	// gr1 - column counter
 	gr1 = gr0;
 	gr1 >>= 1; // Number of columns (/2)
-	
-<NextColumn> // do { Process column } while (gr1 > 0)
-	ar3 = ar0 with gr3 = gr0;
-	ar3 += gr3 with gr3 = gr0 - gr3;
 
+	ar3,gr3 = [ar2++];
+	[dx] = ar3,gr3;
+	ar3,gr3 = [ar2];
+	[dy] = ar3,gr3;
+
+	ar2 = ar4;
+	ar4 = ar6;
+
+<NextColumn> // do { Process column } while (gr1 > 0)
 	gr2 = gr0; // gr0 используется для перехода от строки к строке
 	// Выбрать количество обрабатываемых слов (gr3)
 	gr4 = 32;
@@ -38,22 +48,47 @@ begin ".text_demo3d"			// начало секции кода
 	if >= goto LoadFirstRow;
 	gr4 = gr1;
 <LoadFirstRow>
+	ar3 = ar0 with gr3 = gr0;
+	ar5 = ar2 with gr5 = gr0;
+	ar6 = ar4 with gr6 = gr0;
+
+	ar3 += gr3 with gr3 = gr4;
+	gr3 <<= 1;
+	gr3 = gr0 - gr3;
+	ar5 += gr5 with gr5 = gr3;
+	ar6 += gr6 with gr6 = gr3;
+
 	gr4--; 
 	vlen = gr4 with gr4++; // Restore pair counter after decrementing for vlen
-	fpu 0 rep vlen vreg0 = [ar0++]; // Load first row values
-	fpu 0 rep vlen vreg2 = [ar2];   // Load deltas
+
+	// Load first row values
+	fpu 0 rep vlen vreg0 = [ar0++];
+	fpu 1 rep vlen vreg0 = [ar2++];
+	fpu 2 rep vlen vreg0 = [ar4++];
+	
+	// Load deltas
+	gr7 = dx;
+	fpu 0 rep vlen vreg2 = [gr7];
+	gr7 = dy;
+	fpu 1 rep vlen vreg2 = [gr7];
+	fpu 2 rep vlen vreg2 = [ar1++];
 <NextRow>
 	fpu 0 .float vreg0 = vreg0 + vreg2;
+	fpu 1 .float vreg0 = vreg0 + vreg2;
+	fpu 2 .float vreg0 = vreg0 + vreg2;
 	fpu 0 rep vlen [ar3++] = vreg0;
+	fpu 1 rep vlen [ar5++] = vreg0;
+	fpu 2 rep vlen [ar6++] = vreg0;
 	ar3 += gr3;
+	ar5 += gr5;
+	ar6 += gr6;
 	gr2--;
 	if > goto NextRow;
 	// Exit NextRow
 	gr1 = gr1 - gr4; 
 	if > goto NextColumn;
-<Exit>
-	gr7 = gr0;
 
+<Exit>
     pop ar6,gr6;
     pop ar5,gr5;
     pop ar4,gr4;
