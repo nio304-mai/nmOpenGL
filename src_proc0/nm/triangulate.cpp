@@ -348,7 +348,7 @@ int triangulateOneTriangle(	const Triangle& tr,
 		nm32f max_length = triangle_width > triangle_height ? triangle_width: triangle_height; // max of ...
 		nm32f max_size = maxWidth < maxHeight ? maxWidth: maxHeight; // min of ...
 		nm32f n = ceil(max_length / max_size);
-		nm32f n_of_triangles = sum_of_arithmetic_progression(1, 2 * n - 1, n);
+		nm32f n_of_triangles = n * n;
 
 		if (n_of_triangles > vsize){
 			//There are no space in the output buffer for this number of triangles
