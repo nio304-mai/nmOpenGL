@@ -1,5 +1,4 @@
 #include <cmath> // pow for NMC-SDK
-
 #include "service.h"
 
 static Buffer initBuf(void *data, int size)
@@ -217,147 +216,106 @@ static nm32f sum_of_arithmetic_progression(nm32f a1, nm32f an, nm32f n){
 	return (n * (a1 + an) / 2);
 }
 
-extern "C" int buildMatrix(nm32f *array, const nm32f *ab_dx_64, int k);
+extern "C" int buildMatrix(nm32f *x, nm32f *y, nm32f *z, 
+				            const nm32f *ab_dxy, 
+				            const nm32f *dz, 
+				            int k);
 
 void buildPoints(const Triangle &tr, nm32f *x, nm32f *y, nm32f *z, int n)
 {
-	struct Point a = tr.points[0];
-	struct Point b = tr.points[1];
-	struct Point c = tr.points[2];
+		struct Point a = tr.points[0];
+		struct Point b = tr.points[1];
+		struct Point c = tr.points[2];
 
-	nm32f ab_dx = (b.x - a.x) / n;
-	nm32f ab_dx_64[2] = {ab_dx, ab_dx};
-	//nm32f *ab_dx_ptr = &ab_dx;
-	//printf("ab_dx = %f\n\r", ab_dx);
-	//printf("ab_dx_64 = %f\n\r", ab_dx_64[0]);
-	nm32f ab_dy = (b.y - a.y) / n;
-	nm32f ab_dy_64[2] = {ab_dy, ab_dy};
+		nm32f ab_dx = (b.x - a.x) / n;
+		nm32f ab_dy = (b.y - a.y) / n;
+		nm32f ab_dxy[4] = {ab_dx, ab_dx, ab_dy, ab_dy};
 
-	nm32f ac_dx = (c.x - a.x) / n;
-	nm32f ac_dy = (c.y - a.y) / n;
-	nm32f ac_dz = (c.z - a.z) / n;
+		nm32f ac_dx = (c.x - a.x) / n;
+		nm32f ac_dy = (c.y - a.y) / n;
+		nm32f ac_dz = (c.z - a.z) / n;
 
-	nm32f bc_dz = (c.z - b.z) / n;
-	nm32f bc_z[16384];
-	nm32f dz[16384];
-	
-	for (int i = 0; i < n; ++i){
-		x[i] = a.x + i * ac_dx;
-	//	y[i] = a.y + i * ac_dy;
-	//	z[i] = a.z + i * ac_dz;
-		bc_z[i] = b.z + i * bc_dz;
-		dz[i] = (bc_z[i] - z[i]) / (n - i);
-	}
-	//x[n] = c.x;
-	//y[n] = c.y;
-	//z[n] = c.z;
-	//dz[n] = 0.0;
-	//int k = (n + 1) + (n + 1) % 2;
-#if 0
-	asm (
-		"push ar0, gr0;\n\t"
-		"push ar1, gr1;\n\t"
-		"ar0 = %0;\n\t"
-		"ar1 = %0 with gr1 = %5;\n\t"
-		"ar1++gr1;\n\t"
-		"gr1 >>= 1;\n\t"
-		"gr1--;\n\t"
-		"vlen = gr1;\n\t"
-		"fpu 0 rep vlen vreg2 = [ar0++];\n\t"
-		"ar0 = %2;\n\t"
-		"fpu 0 rep vlen [ar1++] = vreg2;\n\t"
-		"pop ar1, gr1;\n\t"
-		"pop ar0, gr0;\n\t"
-		: "+rm" (x), "+rm" (y), "+rm" (ab_dx_64)
-		: "rm" (x), "rm" (y), "rm" (k)
-		:
-	);
-#else 
-	//int nrows = buildMatrix(x, ab_dx_64, k);
-	//nrows = buildMatrix(y, ab_dy_64, k);
-	//nrows = buildMatrix(z, dz, k);
-	//printf("Processed %i rows\n\r", nrows);
-#endif
-	//printf("k = %i\n\r", k);
-	//printf("ab_dx = %f\n\r", *ab_dx_ptr);
-	//printf("ab_dx_64 = %f\n\r", ab_dx_64[0]);
-	//for (int i = 0; i < k; ++i){
-	//	for (int j = 0; j < k; ++j){
-	//		printf("%f ", x[i * k + j]);
-	//	}
-	//	puts("");
-	//}
-	//puts("");
-	//for (int i = 0; i < k; ++i){
-	//	for (int j = 0; j < k; ++j){
-	//		printf("%f ", y[i * k + j]);
-	//	}
-	//	puts("");
-	//}
-	//puts("");
+		nm32f bc_dz = (c.z - b.z) / n;
+		nm32f bc_z[16384];
+		nm32f dz[16384];
+
+		int i = 0;
+		for (i = 0; i < (int) n; ++i){
+				x[i] = a.x + i * ac_dx;
+				y[i] = a.y + i * ac_dy;
+				z[i] = a.z + i * ac_dz;
+				bc_z[i] = b.z + i * bc_dz;
+				dz[i] = (bc_z[i] - z[i]) / (n - i);
+		}
+		x[i] = c.x;
+		y[i] = c.y;
+		z[i] = c.z;
+		dz[i] = 0.0;
+		int k = (i + 1) + (i + 1) % 2;	// i = n at this moment
+		buildMatrix(x, y, z, ab_dxy, dz, k);
 }
 
 void printPoints(const nm32f *x, const nm32f *y, const nm32f *z, int n)
 {
-		printf("GLfloat tr_set_1[%i] = {\n\r", (int) (6 * sum_of_arithmetic_progression(1, n, n)));
-		int k = (n + 1) + (n + 1) % 2;
-		for (int i = 0; i < n; ++i){
-				for (int j = 0; j < n - i; ++j){
-						printf("%f,%f,%f,%f,%f,%f,%f,%f,%f\n\r", 
-										x[i * k + j], y[i * k + j], z[i * k + j],
-										x[(i + 1) * k + j], y[(i + 1) * k + j], z[(i + 1) * k + j],
-										x[i * k + (j + 1)], y[i * k + (j + 1)], z[i * k + (j + 1)]);
-				}
+	printf("GLfloat tr_set_1[%i] = {\n\r", (int) (6 * sum_of_arithmetic_progression(1, n, n)));
+	int k = (n + 1) + (n + 1) % 2;
+	for (int i = 0; i < n; ++i){
+		for (int j = 0; j < n - i; ++j){
+			printf("%f,%f,%f,%f,%f,%f,%f,%f,%f\n\r", 
+					x[i * k + j], y[i * k + j], z[i * k + j],
+					x[(i + 1) * k + j], y[(i + 1) * k + j], z[(i + 1) * k + j],
+					x[i * k + (j + 1)], y[i * k + (j + 1)], z[i * k + (j + 1)]);
 		}
-		printf("};\n\r");
-		printf("GLfloat tr_set_2[%i] = {\n\r", (int) (6 * sum_of_arithmetic_progression(1, n - 1, n - 1)));
-		for (int i = 1; i < n; ++i){
-				for (int j = 0; j < n - i; ++j){
-						printf("%f,%f,%f,%f,%f,%f,%f,%f,%f\n\r", 
-										x[i * k + j], y[i * k + j], z[i * k + j],
-										x[i * k + (j + 1)], y[i * k + (j + 1)], z[i * k + (j + 1)],
-										x[(i - 1) * k + (j + 1)], y[(i - 1) * k + (j + 1)], z[(i - 1) * k + (j + 1)]);
-				}
+	}
+	printf("};\n\r");
+	printf("GLfloat tr_set_2[%i] = {\n\r", (int) (6 * sum_of_arithmetic_progression(1, n - 1, n - 1)));
+	for (int i = 1; i < n; ++i){
+		for (int j = 0; j < n - i; ++j){
+			printf("%f,%f,%f,%f,%f,%f,%f,%f,%f\n\r", 
+					x[i * k + j], y[i * k + j], z[i * k + j],
+					x[i * k + (j + 1)], y[i * k + (j + 1)], z[i * k + (j + 1)],
+					x[(i - 1) * k + (j + 1)], y[(i - 1) * k + (j + 1)], z[(i - 1) * k + (j + 1)]);
 		}
-		printf("};\n\r");
+	}
+	printf("};\n\r");
 }
 
 void pushTriangles(const nm32f *x, const nm32f *y, const nm32f *z, int n, Buffer *verticesStack, Buffer *colorsStack)
 {
-		int k = (n + 1) + (n + 1) % 2;
-		for (int i = 0; i < n; ++i){
-				for (int j = 0; j < n - i; ++j){
-						Vertices trVertices = {
-								x[i * k + j], y[i * k + j], z[i * k + j],
-								x[(i + 1) * k + j], y[(i + 1) * k + j], z[(i + 1) * k + j],
-								x[i * k + (j + 1)], y[i * k + (j + 1)], z[i * k + (j + 1)]
+	int k = (n + 1) + (n + 1) % 2;
+	for (int i = 0; i < n; ++i){
+		for (int j = 0; j < n - i; ++j){
+			Vertices trVertices = {
+				x[i * k + j], y[i * k + j], z[i * k + j],
+				x[(i + 1) * k + j], y[(i + 1) * k + j], z[(i + 1) * k + j],
+				x[i * k + (j + 1)], y[i * k + (j + 1)], z[i * k + (j + 1)]
 
-						};
-						Colors trColors = {
-								0,
-								0,
-								0
-						};
-						pushFrontVertices(verticesStack, &trVertices);
-						pushFrontColors(colorsStack, &trColors);
-				}
+			};
+			Colors trColors = {
+				0,
+				0,
+				0
+			};
+			pushFrontVertices(verticesStack, &trVertices);
+			pushFrontColors(colorsStack, &trColors);
 		}
-		for (int i = 1; i < n; ++i){
-				for (int j = 0; j < n - i; ++j){
-						Vertices trVertices = {
-								x[i * n + j], y[i * n + j], 0, 
-								x[i * n + (j + 1)], y[i * n + (j + 1)], 0, 
-								x[(i - 1) * n + (j + 1)], y[(i - 1) * n + (j + 1)], 0
-						};
-						Colors trColors = {
-								0,
-								0,
-								0
-						};
-						pushFrontVertices(verticesStack, &trVertices);
-						pushFrontColors(colorsStack, &trColors);
-				}
+	}
+	for (int i = 1; i < n; ++i){
+		for (int j = 0; j < n - i; ++j){
+			Vertices trVertices = {
+				x[i * n + j], y[i * n + j], 0, 
+				x[i * n + (j + 1)], y[i * n + (j + 1)], 0, 
+				x[(i - 1) * n + (j + 1)], y[(i - 1) * n + (j + 1)], 0
+			};
+			Colors trColors = {
+				0,
+				0,
+				0
+			};
+			pushFrontVertices(verticesStack, &trVertices);
+			pushFrontColors(colorsStack, &trColors);
 		}
+	}
 }
 
 // Return:
@@ -379,90 +337,73 @@ int triangulateOneTriangle(	const Triangle& tr,
 		// Do nothing here, just continue
 	}
 
+	nm32f triangle_width = tr.GetWidth();
+	nm32f triangle_height = tr.GetHeight();
+	
 	// Process the triangle: check the size and split if it is necessary
-	if (tr.isTooBig(maxWidth, maxHeight)){
+	//if (tr.isTooBig(maxWidth, maxHeight)){	// 10000 ticks
+	if (triangle_width > maxWidth || triangle_height > maxHeight){	// 13000 ticks
+
 		//Get the number of output triangles
-		nm32f triangle_width = tr.GetWidth();
-		nm32f triangle_height = tr.GetHeight();
-		//printf("Triangle width is %f\n\r", triangle_width);
-		//printf("Triangle height is %f\n\r", triangle_height);
-		nm32f lengths[2] = {triangle_width, triangle_height};
-		nm32f max_length = max_fabs_in_array(lengths, 2);
-
-		nm32f sizes[2] = {maxWidth, maxHeight};
-		nm32f max_size = min_fabs_in_array(sizes, 2);
-
-		nm32f n = floor(max_length / max_size);
-		//printf("n = %f\n\r", n);
+		nm32f max_length = triangle_width > triangle_height ? triangle_width: triangle_height; // max of ...
+		nm32f max_size = maxWidth < maxHeight ? maxWidth: maxHeight; // min of ...
+		nm32f n = ceil(max_length / max_size);
 		nm32f n_of_triangles = sum_of_arithmetic_progression(1, 2 * n - 1, n);
-		//printf("Number of triangles is %f\n\r", n_of_triangles);
+
 		if (n_of_triangles > vsize){
 			//There are no space in the output buffer for this number of triangles
 		} else {
-			// Get the points of triangle and push it to the output buffer
-			float x[16384];
-			float y[16384];
-			float z[16384];
+			//// Get the points of triangle and push it to the output buffer
+			nm32f x[16384];
+			nm32f y[16384];
+			nm32f z[16384];
 			//buildPoints(tr, x, y, z, (int) n);
-	struct Point a = tr.points[0];
-	struct Point b = tr.points[1];
-	struct Point c = tr.points[2];
+			struct Point a = tr.points[0];
+			struct Point b = tr.points[1];
+			struct Point c = tr.points[2];
 
-	nm32f ab_dx = (b.x - a.x) / n;
-	nm32f ab_dx_64[2] = {ab_dx, ab_dx};
-	//nm32f *ab_dx_ptr = &ab_dx;
-	//printf("ab_dx = %f\n\r", ab_dx);
-	//printf("ab_dx_64 = %f\n\r", ab_dx_64[0]);
-	nm32f ab_dy = (b.y - a.y) / n;
-	nm32f ab_dy_64[2] = {ab_dy, ab_dy};
+			nm32f ab_dx = (b.x - a.x) / n;
+			nm32f ab_dy = (b.y - a.y) / n;
+			nm32f ab_dxy[4] = {ab_dx, ab_dx, ab_dy, ab_dy};
 
-	nm32f ac_dx = (c.x - a.x) / n;
-	nm32f ac_dy = (c.y - a.y) / n;
-	nm32f ac_dz = (c.z - a.z) / n;
+			nm32f ac_dx = (c.x - a.x) / n;
+			nm32f ac_dy = (c.y - a.y) / n;
+			nm32f ac_dz = (c.z - a.z) / n;
 
-	nm32f bc_dz = (c.z - b.z) / n;
-	nm32f bc_z[16384];
-	nm32f dz[16384];
+			nm32f bc_dz = (c.z - b.z) / n;
+			nm32f bc_z[16384];
+			nm32f dz[16384];
 
-	int i = 0;
-	for (i = 0; i < (int) n; ++i){
-		x[i] = a.x + i * ac_dx;
-		y[i] = a.y + i * ac_dy;
-		z[i] = a.z + i * ac_dz;
-		bc_z[i] = b.z + i * bc_dz;
-		dz[i] = (bc_z[i] - z[i]) / (n - i);
-	}
-	x[i] = c.x;
-	y[i] = c.y;
-	z[i] = c.z;
-	dz[i] = 0.0;
-	int k = (i + 1) + (i + 1) % 2;	// i = n at this moment
-#if 0
-	asm (
-		"push ar0, gr0;\n\t"
-		"push ar1, gr1;\n\t"
-		"ar0 = %0;\n\t"
-		"ar1 = %0 with gr1 = %5;\n\t"
-		"ar1++gr1;\n\t"
-		"gr1 >>= 1;\n\t"
-		"gr1--;\n\t"
-		"vlen = gr1;\n\t"
-		"fpu 0 rep vlen vreg2 = [ar0++];\n\t"
-		"ar0 = %2;\n\t"
-		"fpu 0 rep vlen [ar1++] = vreg2;\n\t"
-		"pop ar1, gr1;\n\t"
-		"pop ar0, gr0;\n\t"
-		: "+rm" (x), "+rm" (y), "+rm" (ab_dx_64)
-		: "rm" (x), "rm" (y), "rm" (k)
-		:
-	);
-#else 
-	buildMatrix(x, ab_dx_64, k);
-	buildMatrix(y, ab_dy_64, k);
-	buildMatrix(z, dz, k);
-	//printf("Processed %i rows\n\r", nrows);
-#endif
-			printPoints(x, y, z, (int) n);
+			int i = 0;
+			for (i = 0; i < (int) n; ++i){
+				x[i] = a.x + i * ac_dx;
+				y[i] = a.y + i * ac_dy;
+				z[i] = a.z + i * ac_dz;
+				bc_z[i] = b.z + i * bc_dz;
+				dz[i] = (bc_z[i] - z[i]) / (n - i);
+			}
+			x[i] = c.x;
+			y[i] = c.y;
+			z[i] = c.z;
+			dz[i] = 0.0;
+			int k = (i + 1) + (i + 1) % 2;	// i = n at this moment
+			buildMatrix(x, y, z, ab_dxy, dz, k);
+			//printf("res = %i\n\r", res);
+			//	for (int i = 0; i < k; ++i){
+			//		for (int j = 0; j < k; ++j){
+			//			printf("%f ", x[i * k + j]);
+			//		}
+			//		puts("");
+			//	}
+			//	puts("");
+			//	for (int i = 0; i < k; ++i){
+			//		for (int j = 0; j < k; ++j){
+			//			printf("%f ", y[i * k + j]);
+			//		}
+			//		puts("");
+			//	}
+			//	puts("");
+			//printPoints(x, y, z, (int) n);
 			pushTriangles(x, y, z, (int) n, verticesStack, colorsStack);
 		}
 	} else {
