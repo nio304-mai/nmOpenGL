@@ -359,13 +359,15 @@ int triangulateOneTriangle(	const Triangle& tr,
 	
 	// Process the triangle: check the size and split if it is necessary
 	//if (tr.isTooBig(maxWidth, maxHeight)){	// 10000 ticks
-	if (triangle_width > maxWidth || triangle_height > maxHeight){	// 13000 ticks
+	if (triangle_width > maxWidth || triangle_height > maxHeight){// 13000 ticks
 
 		//Get the number of output triangles
-		nm32f max_length = triangle_width > triangle_height ? triangle_width: triangle_height; // max of ...
-		nm32f max_size = maxWidth < maxHeight ? maxWidth: maxHeight; // min of ...
+		nm32f max_length = triangle_width > triangle_height ? triangle_width: 
+															  triangle_height; 
+		nm32f max_size = maxWidth < maxHeight ? maxWidth: maxHeight; // min of 
 		//nm32f n = ceil(max_length / max_size);
 		//MEASURE(int n = ceil_1((int) max_length, (int) max_size))
+		//int n = ceil_1((int) max_length, (int) max_size);
 		int n = ceil_2((int) max_length, (int) max_size);
 		nm32f n_of_triangles = n * n;
 
@@ -381,15 +383,38 @@ int triangulateOneTriangle(	const Triangle& tr,
 			struct Point b = tr.points[1];
 			struct Point c = tr.points[2];
 
-			nm32f ab_dx = (b.x - a.x) / n;
-			nm32f ab_dy = (b.y - a.y) / n;
+			nm32f div = 1 / n;
+			nm32f pSrcVec[6] = {
+								b.x - a.x,
+								b.y - a.y,
+								c.x - a.x,
+								c.y - a.y,
+								c.z - a.z,
+								c.z - b.z
+
+			};
+			nm32f pDstVec[6];
+			nmppsMulC_32f(pSrcVec, pDstVec, div, 6);
+
+			nm32f ab_dx = pDstVec[0]; 
+			nm32f ab_dy = pDstVec[1];
 			nm32f ab_dxy[4] = {ab_dx, ab_dx, ab_dy, ab_dy};
 
-			nm32f ac_dx = (c.x - a.x) / n;
-			nm32f ac_dy = (c.y - a.y) / n;
-			nm32f ac_dz = (c.z - a.z) / n;
+			nm32f ac_dx = pDstVec[2];
+			nm32f ac_dy = pDstVec[3]; 
+			nm32f ac_dz = pDstVec[4];
 
-			nm32f bc_dz = (c.z - b.z) / n;
+			nm32f bc_dz = pDstVec[5];
+
+			//nm32f ab_dx = (b.x - a.x) * div;
+			//nm32f ab_dy = (b.y - a.y) * div;
+			//nm32f ab_dxy[4] = {ab_dx, ab_dx, ab_dy, ab_dy};
+
+			//nm32f ac_dx = (c.x - a.x) * div;
+			//nm32f ac_dy = (c.y - a.y) * div; 
+			//nm32f ac_dz = (c.z - a.z) * div;
+
+			//nm32f bc_dz = (c.z - b.z) * div;
 			nm32f bc_z[16384];
 			nm32f dz[16384];
 
@@ -422,7 +447,7 @@ int triangulateOneTriangle(	const Triangle& tr,
 			//		puts("");
 			//	}
 			//	puts("");
-			//printPoints(x, y, z, (int) n);
+			printPoints(x, y, z, (int) n);
 			pushTriangles(x, y, z, (int) n, verticesStack, colorsStack);
 		}
 	} else {
