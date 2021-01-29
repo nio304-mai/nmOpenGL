@@ -383,7 +383,7 @@ int triangulateOneTriangle(	const Triangle& tr,
 			struct Point b = tr.points[1];
 			struct Point c = tr.points[2];
 
-			nm32f div = 1 / n;
+			nm32f div = 1 / (nm32f) n;
 			nm32f pSrcVec[6] = {
 								b.x - a.x,
 								b.y - a.y,
@@ -406,15 +406,6 @@ int triangulateOneTriangle(	const Triangle& tr,
 
 			nm32f bc_dz = pDstVec[5];
 
-			//nm32f ab_dx = (b.x - a.x) * div;
-			//nm32f ab_dy = (b.y - a.y) * div;
-			//nm32f ab_dxy[4] = {ab_dx, ab_dx, ab_dy, ab_dy};
-
-			//nm32f ac_dx = (c.x - a.x) * div;
-			//nm32f ac_dy = (c.y - a.y) * div; 
-			//nm32f ac_dz = (c.z - a.z) * div;
-
-			//nm32f bc_dz = (c.z - b.z) * div;
 			nm32f bc_z[16384];
 			nm32f dz[16384];
 
@@ -447,7 +438,7 @@ int triangulateOneTriangle(	const Triangle& tr,
 			//		puts("");
 			//	}
 			//	puts("");
-			printPoints(x, y, z, (int) n);
+			//printPoints(x, y, z, (int) n);
 			pushTriangles(x, y, z, (int) n, verticesStack, colorsStack);
 		}
 	} else {
