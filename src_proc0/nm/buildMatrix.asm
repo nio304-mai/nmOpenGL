@@ -25,8 +25,8 @@ begin ".text_demo3d"			// начало секции кода
 
     gr0 = [--ar5];  // k 
 
-	gr7 = gr0;
-	goto Exit;
+	//gr7 = gr0;
+	//goto Exit;
 	
 	// gr1 - column counter
 	gr1 = gr0;
