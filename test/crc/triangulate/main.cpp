@@ -155,18 +155,18 @@ int triangulate_oneTriangleThreeDivisions_outputVertexesAreCorrect()
 	int srcCount = 1;
 	int maxWidth = 1;
 	int maxHeight = 1;
-	int maxDstSize = 6;
+	int maxDstSize = 4;
 	nm32f *dstVertex = (nm32f *) calloc(maxDstSize * 9, sizeof(nm32f));
 	nm32f expectedDstVertex[] = { 
-									2.50, 2.50, 1.50, 1.50, 2.00, 2.00,
-									2.00, 2.00,	2.00, 2.00, 1.00, 1.00,
-									8.00, 8.00, 5.50, 5.50, 6.50, 6.50,
-									2.25, 3.00, 2.00, 2.00, 2.25, 1.50,
-									1.50, 1.00, 3.00, 1.00, 1.50, 2.00,
-									7.25, 9.00, 7.00, 6.50, 7.25, 5.50,
-									1.50, 2.25, 2.50, 1.00, 3.00, 2.25,
-									2.00, 1.50, 2.00, 1.00, 1.00, 1.50,
-									5.50, 7.25, 8.00, 4.00, 9.00, 7.25
+									1.00, 2.00, 1.50, 1.50,
+									1.00, 1.00,	2.00, 2.00,
+									4.00, 6.50, 5.50, 5.50,
+									1.50, 2.50, 2.00, 2.50,
+									2.00, 2.00, 3.00, 2.00,
+									5.50, 8.00, 7.00, 8.00,
+									2.00, 3.00, 2.50, 2.00,
+									1.00, 1.00, 2.00, 1.00,
+									6.50, 9.00, 8.00, 6.50
 								};
 	v4nm32f *dstColor = (v4nm32f *) calloc(maxDstSize * 3, sizeof(v4nm32f));
 	int srcTreatedCount;
@@ -175,9 +175,15 @@ int triangulate_oneTriangleThreeDivisions_outputVertexesAreCorrect()
 	//Act
 	res = triangulate(srcVertex, srcColor, srcCount, maxWidth, maxHeight, maxDstSize, dstVertex, dstColor, &srcTreatedCount);
 	(void) res;
-	
+
+	for (int i = 0; i < 9; ++i){
+		for (int j = 0; j < 4; ++j){
+			printf("%f ", dstVertex[i * 4 + j]);
+		}
+		puts("");
+	}
 	//Assert
-	TEST_ARRAYS_EQUAL(dstVertex, expectedDstVertex, 54);
+	TEST_ARRAYS_EQUAL(dstVertex, expectedDstVertex, 36);
 
 	return 0;
 }

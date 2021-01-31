@@ -283,7 +283,8 @@ void printPoints(const nm32f *x, const nm32f *y, const nm32f *z, int n)
 
 void pushTriangles(const nm32f *x, const nm32f *y, const nm32f *z, int n, Buffer *verticesStack, Buffer *colorsStack)
 {
-	int k = (n + 1) + (n + 1) % 2;
+	puts("Push triangles");
+	int k = n + n % 2;
 	for (int i = 0; i < n; ++i){
 		for (int j = 0; j < n - i; ++j){
 			Vertices trVertices = {
@@ -304,9 +305,9 @@ void pushTriangles(const nm32f *x, const nm32f *y, const nm32f *z, int n, Buffer
 	for (int i = 1; i < n; ++i){
 		for (int j = 0; j < n - i; ++j){
 			Vertices trVertices = {
-				x[i * n + j], y[i * n + j], 0, 
-				x[i * n + (j + 1)], y[i * n + (j + 1)], 0, 
-				x[(i - 1) * n + (j + 1)], y[(i - 1) * n + (j + 1)], 0
+				x[i * k + j], y[i * k + j], z[i * k + j], 
+				x[i * k + (j + 1)], y[i * k + (j + 1)], z[i * k + (j + 1)], 
+				x[(i - 1) * k + (j + 1)], y[(i - 1) * k + (j + 1)], z[(i - 1) * k + (j + 1)]
 			};
 			Colors trColors = {
 				0,
@@ -410,18 +411,23 @@ int triangulateOneTriangle(	const Triangle& tr,
 			nm32f dz[16384];
 
 			int i = 0;
-			for (i = 0; i < (int) n; ++i){
-				x[i] = a.x + i * ac_dx;
-				y[i] = a.y + i * ac_dy;
-				z[i] = a.z + i * ac_dz;
-				bc_z[i] = b.z + i * bc_dz;
+			x[0] = a.x;
+			y[0] = a.y;
+			z[0] = a.z;
+			bc_z[0] = b.z;
+			dz[0] = (bc_z[0] - z[0]) / n;
+			for (i = 1; i < (int) n; ++i){
+				x[i] = x[i - 1] + ac_dx;
+				y[i] = y[i - 1] + ac_dy;
+				z[i] = z[i - 1] + ac_dz;
+				bc_z[i] = bc_z[i - 1] + bc_dz;
 				dz[i] = (bc_z[i] - z[i]) / (n - i);
 			}
-			x[i] = c.x;
-			y[i] = c.y;
-			z[i] = c.z;
-			dz[i] = 0.0;
-			int k = (i + 1) + (i + 1) % 2;	// i = n at this moment
+			x[n] = c.x;
+			y[n] = c.y;
+			z[n] = c.z;
+			dz[n] = 0.0;
+			int k = (n + 1) + (n + 1) % 2;	// i = n at this moment
 			buildMatrix(x, y, z, ab_dxy, dz, k);
 			//printf("res = %i\n\r", res);
 			//	for (int i = 0; i < k; ++i){
@@ -438,8 +444,8 @@ int triangulateOneTriangle(	const Triangle& tr,
 			//		puts("");
 			//	}
 			//	puts("");
-			//printPoints(x, y, z, (int) n);
-			pushTriangles(x, y, z, (int) n, verticesStack, colorsStack);
+			printPoints(x, y, z, (int) n);
+			pushTriangles(x, y, z, ((int) n) + 1, verticesStack, colorsStack);
 		}
 	} else {
 		// Triangle size is OK
