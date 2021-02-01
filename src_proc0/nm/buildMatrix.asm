@@ -28,11 +28,8 @@ begin ".text_demo3d"			// начало секции кода
 	//gr7 = gr0;
 	//goto Exit;
 	
-	// gr1 - column counter
-	gr1 = gr0;
-	gr1 >>= 1; // Number of columns (/2)
-
-	ar3,gr3 = [ar2++];
+	// gr0 - column counter
+	ar3,gr3 = [ar2++] with gr1 = gr0 >> 1; //gr0 - Number of columns (/2)
 	[dx] = ar3,gr3;
 	ar3,gr3 = [ar2];
 	[dy] = ar3,gr3;
@@ -81,8 +78,7 @@ begin ".text_demo3d"			// начало секции кода
 	fpu 2 rep vlen [ar6++] = vreg0;
 	ar3 += gr3;
 	ar5 += gr5;
-	ar6 += gr6;
-	gr2--;
+	ar6 += gr6 with gr2--;
 	if > goto NextRow;
 	// Exit NextRow
 	gr1 = gr1 - gr4; 
